@@ -1,0 +1,3 @@
+execute_script C:\Users\timof\IdeaProjects\prog-lab5\data\script.txt
+
+

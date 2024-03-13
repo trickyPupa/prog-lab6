@@ -1,19 +1,62 @@
 package server.managers;
 
+import common.abstractions.*;
 import common.commands.abstractions.Command;
 import common.commands.implementations.*;
 import technical.exceptions.NoSuchCommandException;
-import common.abstractions.AbstractCommandHandler;
-import common.abstractions.Handler;
-import common.abstractions.IInputManager;
-import common.abstractions.IOutputManager;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
- * Класс - обработчик команд программы; считывает команды из {@link IInputManager} и провоцирует их исполнение.
+ * Класс - обработчик команд программы; считывает команды из {@link IInputManager} и вызывает их.
  */
-public class ServerCommandHandler extends AbstractCommandHandler implements Handler {
+public class ServerCommandHandler {
+    public class ShellValuables {
+        private IOutputManager outputManager;
+        private final HistoryManager historyManager;
+        private CollectionManager collectionManager;
+        private FileManager fileManager;
+        private ClientsManager clientsManager;
+
+        public final Map<String, Function<Object[], Command>> commands = new HashMap<>();
+
+        public ShellValuables(ClientsManager cm, IOutputManager out, CollectionManager col,
+                              FileManager fm, HistoryManager history){
+            outputManager = out;
+            collectionManager = col;
+            historyManager = history;
+            fileManager = fm;
+            clientsManager = cm;
+        }
+
+        public HistoryManager getHistoryManager() {
+            return historyManager;
+        }
+
+        public CollectionManager getCollectionManager() {
+            return collectionManager;
+        }
+
+        public IOutputManager getOutputManager() {
+            return outputManager;
+        }
+
+        public FileManager getFileManager() {
+            return fileManager;
+        }
+
+        public ClientsManager getClientsManager(){
+            return clientsManager;
+        }
+    }
+
+    protected ShellValuables vals;
+
+    protected AbstractReceiver receiver;
+
     {
         vals.commands.put("help", HelpCommand::new);
         vals.commands.put("save", SaveCommand::new);
@@ -33,41 +76,15 @@ public class ServerCommandHandler extends AbstractCommandHandler implements Hand
         vals.commands.put("execute_script", ExecuteScriptCommand::new);
     }
 
-    public ServerCommandHandler(IInputManager inp, IOutputManager out, CollectionManager col, FileManager fm){
-        super(inp, out, col, fm);
+    public ServerCommandHandler(IOutputManager out, CollectionManager col, FileManager fm, ClientsManager cm){
+        vals = new ShellValuables(cm, out, col, fm, new HistoryManager());
         receiver = new BaseCommandReceiver(vals);
     }
 
-    @Override
-    public void nextCommand(String line) {
-        line = line.strip();
-        String commandName;
-//        String[] args;
-        Object[] args;
-
-        if (line.contains(" ")){
-            commandName = line.substring(0, line.indexOf(" ")).strip();
-            args = line.substring(1 + commandName.length()).split(" ");
-        } else{
-            commandName = line.strip();
-            args = new String[]{""};
-        }
-
-        if (!vals.commands.containsKey(commandName)){
-            throw new NoSuchCommandException(line);
-        }
-        Command currentCommand = vals.commands.get(commandName).apply(args);
+    public void nextCommand() {
+        Command currentCommand = vals.getClientsManager().getNextRequest();
 
         currentCommand.execute(receiver);
         vals.getHistoryManager().next(currentCommand);
-    }
-
-    @Override
-    public void nextCommand() throws IOException {
-        IInputManager input = vals.getInputManager();
-
-        String line = input.nextLine().strip();
-
-        nextCommand(line);
     }
 }

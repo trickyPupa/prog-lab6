@@ -1,10 +1,12 @@
 package common.abstractions;
 
+import server.managers.ServerCommandHandler;
+
 public abstract class AbstractReceiver {
 
-    protected AbstractCommandHandler.ShellValuables shell;
+    protected ServerCommandHandler.ShellValuables shell;
 
-    public AbstractReceiver(AbstractCommandHandler.ShellValuables shell){
+    public AbstractReceiver(ServerCommandHandler.ShellValuables shell){
         this.shell = shell;
     }
 

@@ -1,0 +1,19 @@
+Исправить команды на сервере:
+    exit
+    info
+    help
+    execute_script
+    filterByGoldenPalmCount
+    history
+    minByCoordinates
+    removeAllByGoldenPalmCount
+    removeById
+    removeLower
+
+Сделать команды клиента
+Запрос и получение ответа клиентом
+Запрос и отправка ответа сервером
+Сделать общие классы: model, commands еще пару внешним модулем
+Логгировние
+Нормальный абстрактный ресивер
+Сериализация клиентом и десериализация сервером
