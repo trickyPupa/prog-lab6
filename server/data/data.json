@@ -1,0 +1,73 @@
+[ {
+  "id" : 1,
+  "creationDate" : "18.02.2024",
+  "name" : "film3",
+  "oscarsCount" : 2,
+  "goldenPalmCount" : 2,
+  "length" : 120,
+  "coordinates" : {
+    "x" : 0,
+    "y" : 1
+  },
+  "mpaaRating" : "NC_17",
+  "director" : {
+    "name" : "Алексей",
+    "birthday" : "20.11.1932",
+    "eyeColor" : "BLUE",
+    "hairColor" : "RED",
+    "nationality" : "INDIA",
+    "location" : {
+      "x" : 12.0,
+      "y" : 11,
+      "z" : 9
+    }
+  }
+}, {
+  "id" : 2,
+  "creationDate" : "18.02.2024",
+  "name" : "film2",
+  "oscarsCount" : 1,
+  "goldenPalmCount" : 7,
+  "length" : 103,
+  "coordinates" : {
+    "x" : 90,
+    "y" : 20
+  },
+  "mpaaRating" : "PG_13",
+  "director" : {
+    "name" : "Robin",
+    "birthday" : "10.12.2003",
+    "eyeColor" : "BLUE",
+    "hairColor" : "RED",
+    "nationality" : "FRANCE",
+    "location" : {
+      "x" : 11.0,
+      "y" : 10,
+      "z" : 9
+    }
+  }
+}, {
+  "id" : 3,
+  "creationDate" : "19.02.2024",
+  "name" : "film4",
+  "oscarsCount" : 4,
+  "goldenPalmCount" : 4,
+  "length" : 1543,
+  "coordinates" : {
+    "x" : 1,
+    "y" : 2
+  },
+  "mpaaRating" : "PG",
+  "director" : {
+    "name" : "Герман",
+    "birthday" : "20.11.1856",
+    "eyeColor" : "BLUE",
+    "hairColor" : "RED",
+    "nationality" : "INDIA",
+    "location" : {
+      "x" : 1.0,
+      "y" : 2,
+      "z" : 3
+    }
+  }
+} ]
