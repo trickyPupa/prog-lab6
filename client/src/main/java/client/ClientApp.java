@@ -1,6 +1,7 @@
 package client;
 
-import client.exceptions.*;
+import common.abstractions.AbstractReceiver;
+import common.exceptions.*;
 import common.abstractions.Handler;
 import common.abstractions.IInputManager;
 import common.abstractions.IOutputManager;
@@ -8,13 +9,18 @@ import common.abstractions.IOutputManager;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class ClientApp {
+    public static int PORT = 7783;
+    public static String HOST_NAME = "";
 
     public static void main(String[] args) {
-        ;
+        var s = Serializer.prepareData("fdslnf;ldsa");
+        System.out.println(Arrays.toString(s));
+
+//        System.out.println(Serializer.deserializeData(s));
     }
 
     public static void start(){
@@ -22,15 +28,17 @@ public class ClientApp {
 
             IInputManager inputManager = new InputManager(input);
             IOutputManager outputManager = new OutputManager();
-            AbstractServerRequestManager serverRequestManager = new ServerRequestManager();
+            AbstractReceiver receiver = new ClientReciver();
 
-            Handler handler = new ClientCommandHandler(inputManager, outputManager, serverRequestManager);
+            AbstractClientRequestManager clientRequestManager = new ClientRequestManager(HOST_NAME, PORT);
+
+            Handler handler = new ClientCommandHandler(inputManager, outputManager, clientRequestManager, receiver);
 
             while (true){
                 try {
                     handler.nextCommand();
 
-                    //dfs
+                    // отправка серверу
                 } catch (WrongArgumentException e){
                     outputManager.print(e.toString());
                 } catch (InterruptException e){
@@ -44,6 +52,9 @@ public class ClientApp {
                     System.out.println("main catch runtime");
                 }
             }
+        }
+        catch (UnknownHostException e){
+            ;
         }
         catch(IOException e){
             System.out.println("Ошибка при чтении данных");

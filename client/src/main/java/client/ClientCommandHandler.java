@@ -1,6 +1,7 @@
 package client;
 
-import client.exceptions.NoSuchCommandException;
+import common.abstractions.AbstractReceiver;
+import common.exceptions.NoSuchCommandException;
 import common.abstractions.Handler;
 import common.abstractions.IInputManager;
 import common.abstractions.IOutputManager;
@@ -19,7 +20,8 @@ public class ClientCommandHandler implements Handler {
 
     private IInputManager inputManager;
     private IOutputManager outputManager;
-    private AbstractServerRequestManager serverRequestManager;
+    private AbstractClientRequestManager clientRequestManager;
+    private AbstractReceiver receiver;
 
     public final Map<String, Function<Object[], Command>> commands = new HashMap<>();
 
@@ -41,10 +43,12 @@ public class ClientCommandHandler implements Handler {
         commands.put("execute_script", ExecuteScriptCommand::new);
     }
 
-    public ClientCommandHandler(IInputManager inp, IOutputManager out, AbstractServerRequestManager srm){
+    public ClientCommandHandler(IInputManager inp, IOutputManager out, AbstractClientRequestManager crm,
+                                AbstractReceiver rec){
         inputManager = inp;
         outputManager = out;
-        serverRequestManager = srm;
+        clientRequestManager = crm;
+        receiver = rec;
     }
 
     @Override
@@ -67,14 +71,15 @@ public class ClientCommandHandler implements Handler {
         }
         Command currentCommand = commands.get(commandName).apply(args);
 
+        currentCommand.execute(receiver);
 
         // сериализовать команду
 
         // отправить запрос серверу
-        serverRequestManager.makeRequest(currentCommand);
+        clientRequestManager.makeRequest(currentCommand);
 
         // получить ответ сервера
-        String result = serverRequestManager.getResponse();
+        String result = clientRequestManager.getResponse();
 
         outputManager.print(result);
     }
