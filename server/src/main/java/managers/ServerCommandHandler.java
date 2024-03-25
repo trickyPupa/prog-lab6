@@ -9,25 +9,25 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Класс - обработчик команд программы; считывает команды из {@link IInputManager} и вызывает их.
+ * Класс - обработчик команд программы; считывает команды и вызывает их.
  */
 public class ServerCommandHandler {
     public class ShellValuables {
-        private IOutputManager outputManager;
+        private IOutputManager serverOutputManager;
+        private IOutputManager consoleOutputManager;
         private final HistoryManager historyManager;
         private CollectionManager collectionManager;
         private FileManager fileManager;
-        private ClientsManager clientsManager;
 
         public final Map<String, Function<Object[], Command>> commands = new HashMap<>();
 
-        public ShellValuables(ClientsManager cm, IOutputManager out, CollectionManager col,
+        public ShellValuables(IOutputManager out1, IOutputManager out2, CollectionManager col,
                               FileManager fm, HistoryManager history){
-            outputManager = out;
+            serverOutputManager = out1;
+            consoleOutputManager = out2;
             collectionManager = col;
             historyManager = history;
             fileManager = fm;
-            clientsManager = cm;
         }
 
         public HistoryManager getHistoryManager() {
@@ -38,16 +38,16 @@ public class ServerCommandHandler {
             return collectionManager;
         }
 
-        public IOutputManager getOutputManager() {
-            return outputManager;
+        public IOutputManager getServerOutputManager() {
+            return serverOutputManager;
+        }
+
+        public IOutputManager getConsoleOutputManager(){
+            return consoleOutputManager;
         }
 
         public FileManager getFileManager() {
             return fileManager;
-        }
-
-        public ClientsManager getClientsManager(){
-            return clientsManager;
         }
     }
 
@@ -74,13 +74,12 @@ public class ServerCommandHandler {
         vals.commands.put("execute_script", ExecuteScriptCommand::new);
     }
 
-    public ServerCommandHandler(IOutputManager out, CollectionManager col, FileManager fm, ClientsManager cm){
-        vals = new ShellValuables(cm, out, col, fm, new HistoryManager());
+    public ServerCommandHandler(IOutputManager server_out, IOutputManager console_out, CollectionManager col, FileManager fm){
+        vals = new ShellValuables(server_out, console_out, col, fm, new HistoryManager());
         receiver = new ServerCommandReceiver(vals);
     }
 
-    public void nextCommand() {
-        Command currentCommand = vals.getClientsManager().getNextRequest();
+    public void nextCommand(Command currentCommand) {
 
         currentCommand.execute(receiver);
         vals.getHistoryManager().next(currentCommand);

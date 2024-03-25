@@ -1,5 +1,6 @@
 package common.commands.implementations;
 
+import common.abstractions.DataInputReceiver;
 import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
 
@@ -35,4 +36,5 @@ public class AddCommand extends AbstractCommand{
     public void execute(AbstractReceiver rec) {
         rec.add(getArgs());
     }
+
 }

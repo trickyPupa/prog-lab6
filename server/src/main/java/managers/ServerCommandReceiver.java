@@ -19,6 +19,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
     private ServerCommandHandler.ShellValuables shell;
 
     public ServerCommandReceiver(ServerCommandHandler.ShellValuables shell){
+        super(null, shell.getServerOutputManager());
         this.shell = shell;
     }
 
@@ -33,19 +34,19 @@ public class ServerCommandReceiver extends AbstractReceiver {
             FileManager fm = shell.getFileManager();
             fm.writeToFile(shell.getCollectionManager().getCollection());
         } catch (JsonProcessingException e) {
-            shell.getOutputManager().print("Не записать в файл:\n" + e.getMessage());
+            shell.getServerOutputManager().print("Не записать в файл:\n" + e.getMessage());
         }
     }
 
     @Override
     public void clear(Object[] args) {
         shell.getCollectionManager().clear();
-        shell.getOutputManager().print("Коллекция очищена.");
+        shell.getServerOutputManager().print("Коллекция очищена.");
     }
 
     @Override
     public void show(Object[] args) {
-        shell.getOutputManager().print(shell.getCollectionManager().presentView());
+        shell.getServerOutputManager().print(shell.getCollectionManager().presentView());
     }
 
     // подумать
@@ -57,7 +58,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
     // сделать красивый вывод
     @Override
     public void info(Object[] args) {
-        IOutputManager output = shell.getOutputManager();
+        IOutputManager output = shell.getServerOutputManager();
         Map<String, String> info = shell.getCollectionManager().getInfo();
         output.print("Информация о коллекции:");
 
@@ -100,16 +101,16 @@ public class ServerCommandReceiver extends AbstractReceiver {
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
 
         if (collection.isEmpty()){
-            shell.getOutputManager().print("Коллекция пуста.");
+            shell.getServerOutputManager().print("Коллекция пуста.");
             return;
         }
-        shell.getOutputManager().print(collection.stream().filter((x) -> Objects.equals(x.getGoldenPalmCount(), gp_count)));
+        shell.getServerOutputManager().print(collection.stream().filter((x) -> Objects.equals(x.getGoldenPalmCount(), gp_count)));
     }
 
     // подумать как сделать и изменить на красивый вывод
     @Override
     public void help(Object[] args) {
-        IOutputManager output = shell.getOutputManager();
+        IOutputManager output = shell.getServerOutputManager();
         var commandsList = shell.commands;
 
         output.print("Список доступных команд.");
@@ -126,7 +127,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
     // подумать
     @Override
     public void history(Object[] args) {
-        IOutputManager output = shell.getOutputManager();
+        IOutputManager output = shell.getServerOutputManager();
 
         output.print("[");
         for(Command i : shell.getHistoryManager().getHistory()){
@@ -141,11 +142,11 @@ public class ServerCommandReceiver extends AbstractReceiver {
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
 
         if (collection.isEmpty()){
-            shell.getOutputManager().print("Коллекция пуста.");
+            shell.getServerOutputManager().print("Коллекция пуста.");
             return;
         }
 
-        shell.getOutputManager().print(collection.stream().min(Comparator.comparing(Movie::getCoordinates)).toString());
+        shell.getServerOutputManager().print(collection.stream().min(Comparator.comparing(Movie::getCoordinates)).toString());
     }
 
     // проверить
@@ -168,7 +169,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
                 .filter((x) -> Objects.equals(x.getGoldenPalmCount(), gp_count))
                 .forEach((x) -> shell.getCollectionManager().remove(x));
 
-        shell.getOutputManager().print("Элементы с количеством золотых пальмовых ветвей = " + gp_count + " удалены.");
+        shell.getServerOutputManager().print("Элементы с количеством золотых пальмовых ветвей = " + gp_count + " удалены.");
     }
 
     // проверить
@@ -186,11 +187,11 @@ public class ServerCommandReceiver extends AbstractReceiver {
                 .filter((x) -> x.getId() == id);
 
         if (stream.findAny().isEmpty()){
-            shell.getOutputManager().print("В коллекции нет элемента с id=" + id + ".");
+            shell.getServerOutputManager().print("В коллекции нет элемента с id=" + id + ".");
         } else {
             stream.forEach((x) -> {
                 shell.getCollectionManager().remove(x);
-                shell.getOutputManager().print("Элемент c id=" + id + "удален.");
+                shell.getServerOutputManager().print("Элемент c id=" + id + "удален.");
             });
         }
     }
@@ -198,11 +199,11 @@ public class ServerCommandReceiver extends AbstractReceiver {
     @Override
     public void removeFirst(Object[] args) {
         if (shell.getCollectionManager().getCollection().isEmpty()){
-            shell.getOutputManager().print("Коллекция пуста.");
+            shell.getServerOutputManager().print("Коллекция пуста.");
             return;
         }
         shell.getCollectionManager().removeFirst();
-        shell.getOutputManager().print("Элемент удален.");
+        shell.getServerOutputManager().print("Элемент удален.");
     }
 
     // проверить
@@ -212,7 +213,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
         Vector<Movie> collection = cm.getCollection();
 
         if (collection.isEmpty()){
-            shell.getOutputManager().print("Коллекция пуста.");
+            shell.getServerOutputManager().print("Коллекция пуста.");
             return;
         }
 
@@ -222,7 +223,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
                 .filter((x) -> x.compareTo(elem) < 0)
                 .forEach((x) -> {
                     cm.remove(x);
-                    shell.getOutputManager().print(String.format("Удален элемент {%100s}.", x));
+                    shell.getServerOutputManager().print(String.format("Удален элемент {%100s}.", x));
                 });
     }
 
@@ -238,10 +239,10 @@ public class ServerCommandReceiver extends AbstractReceiver {
         for (Movie i : collection){
             if (i.getId() == id){
                 i.update((Movie) args[1]);
-                shell.getOutputManager().print("Элемент c id=" + id + " обновлён.");
+                shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
                 return;
             }
         }
-        shell.getOutputManager().print("В коллекции нет элемента с id=" + id + ".");
+        shell.getServerOutputManager().print("В коллекции нет элемента с id=" + id + ".");
     }
 }

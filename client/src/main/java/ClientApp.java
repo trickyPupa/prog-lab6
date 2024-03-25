@@ -1,10 +1,8 @@
-package client;
-
-import common.abstractions.AbstractReceiver;
+import client.*;
+import common.OutputManager;
+import common.abstractions.*;
 import common.exceptions.*;
-import common.abstractions.Handler;
-import common.abstractions.IInputManager;
-import common.abstractions.IOutputManager;
+import data_transfer.Serializer;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -28,11 +26,13 @@ public class ClientApp {
 
             IInputManager inputManager = new InputManager(input);
             IOutputManager outputManager = new OutputManager();
-            AbstractReceiver receiver = new ClientReciver();
+            AbstractReceiver receiver = new ClientReceiver(inputManager, outputManager);
+            DataInputReceiver diReceiver = null;
 
             AbstractClientRequestManager clientRequestManager = new ClientRequestManager(HOST_NAME, PORT);
 
-            Handler handler = new ClientCommandHandler(inputManager, outputManager, clientRequestManager, receiver);
+            Handler handler = new ClientCommandHandler(inputManager, outputManager, clientRequestManager,
+                    receiver, diReceiver);
 
             while (true){
                 try {

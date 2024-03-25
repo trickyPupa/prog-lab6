@@ -1,8 +1,12 @@
 package common.abstractions;
 
 public abstract class AbstractReceiver {
+    protected IInputManager inputManager;
+    protected IOutputManager outputManager;
 
-    public AbstractReceiver(){
+    public AbstractReceiver(IInputManager inp, IOutputManager out) {
+        inputManager = inp;
+        outputManager = out;
     }
 
     public void add(Object[] args){
@@ -66,70 +70,6 @@ public abstract class AbstractReceiver {
     }
 
     public void update(Object[] args){
-        return;
-    }
-
-    public void add(String[] args){
-        return;
-    }
-
-    public void save(String[] args){
-        return;
-    }
-
-    public void clear(String[] args){
-        return;
-    }
-
-    public void show(String[] args){
-        return;
-    }
-
-    public void exit(String[] args){
-        return;
-    }
-
-    public void info(String[] args){
-        return;
-    }
-
-    public void executeScript(String[] args){
-        return;
-    }
-
-    public void filterByGoldenPalmCount(String[] args){
-        return;
-    }
-
-    public void help(String[] args){
-        return;
-    }
-
-    public void history(String[] args){
-        return;
-    }
-
-    public void minByCoordinates(String[] args){
-        return;
-    }
-
-    public void removeAllByGoldenPalmCount(String[] args){
-        return;
-    }
-
-    public void removeById(String[] args){
-        return;
-    }
-
-    public void removeFirst(String[] args){
-        return;
-    }
-
-    public void removeLower(String[] args){
-        return;
-    }
-
-    public void update(String[] args){
         return;
     }
     

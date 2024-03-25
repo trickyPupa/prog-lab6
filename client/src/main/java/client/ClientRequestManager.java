@@ -2,6 +2,7 @@ package client;
 
 import data_transfer.CommandRequest;
 import data_transfer.CommandResponse;
+import data_transfer.Serializer;
 import exceptions.ConnectionsFallsExcetion;
 import common.commands.abstractions.Command;
 

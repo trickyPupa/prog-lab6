@@ -1,14 +1,14 @@
 package client;
 
-import common.abstractions.AbstractReceiver;
+import common.abstractions.*;
 import common.exceptions.NoSuchCommandException;
-import common.abstractions.Handler;
-import common.abstractions.IInputManager;
-import common.abstractions.IOutputManager;
 import common.commands.abstractions.Command;
 import common.commands.implementations.*;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,7 +21,8 @@ public class ClientCommandHandler implements Handler {
     private IInputManager inputManager;
     private IOutputManager outputManager;
     private AbstractClientRequestManager clientRequestManager;
-    private AbstractReceiver receiver;
+    private AbstractReceiver simpleReceiver;
+    private DataInputReceiver dataInputReceiver;
 
     public final Map<String, Function<Object[], Command>> commands = new HashMap<>();
 
@@ -44,11 +45,12 @@ public class ClientCommandHandler implements Handler {
     }
 
     public ClientCommandHandler(IInputManager inp, IOutputManager out, AbstractClientRequestManager crm,
-                                AbstractReceiver rec){
+                                AbstractReceiver rec, DataInputReceiver dir){
         inputManager = inp;
         outputManager = out;
         clientRequestManager = crm;
-        receiver = rec;
+        simpleReceiver = rec;
+        dataInputReceiver = dir;
     }
 
     @Override
@@ -71,7 +73,15 @@ public class ClientCommandHandler implements Handler {
         }
         Command currentCommand = commands.get(commandName).apply(args);
 
-        currentCommand.execute(receiver);
+        ArrayList<Class> a = new ArrayList<>();
+        a.add(AddCommand.class);
+        a.add(UpdateCommand.class);
+        a.add(RemoveLowerCommand.class);
+
+        if (a.contains(currentCommand.getClass()))
+            currentCommand.execute(dataInputReceiver);
+        else
+            currentCommand.execute(simpleReceiver);
 
         // сериализовать команду
 
