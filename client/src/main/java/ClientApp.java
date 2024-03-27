@@ -2,23 +2,23 @@ import client.*;
 import common.OutputManager;
 import common.abstractions.*;
 import common.exceptions.*;
+import data_transfer.ConnectionRequest;
+import data_transfer.ConnectionResponse;
 import data_transfer.Serializer;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class ClientApp {
-    public static int PORT = 7783;
-    public static String HOST_NAME = "";
+    public static int PORT = 1783;
+    public static String HOST_NAME = "localhost";
 
     public static void main(String[] args) {
-        var s = Serializer.prepareData("fdslnf;ldsa");
-        System.out.println(Arrays.toString(s));
-
-//        System.out.println(Serializer.deserializeData(s));
+        start();
     }
 
     public static void start(){
@@ -29,10 +29,20 @@ public class ClientApp {
             AbstractReceiver receiver = new ClientReceiver(inputManager, outputManager);
             DataInputReceiver diReceiver = null;
 
-            AbstractClientRequestManager clientRequestManager = new ClientRequestManager(HOST_NAME, PORT);
+            AbstractClientRequestManager clientRequestManager = new ClientRequestManager(InetAddress.getLocalHost(), PORT);
 
-            Handler handler = new ClientCommandHandler(inputManager, outputManager, clientRequestManager,
+            ClientCommandHandler handler = new ClientCommandHandler(inputManager, outputManager, clientRequestManager,
                     receiver, diReceiver);
+
+
+            clientRequestManager.makeRequest(new ConnectionRequest());
+            var answer = clientRequestManager.getResponse();
+            outputManager.print(answer.getMessage());
+
+            if (!((ConnectionResponse) answer).isSuccess()){
+                outputManager.print("Попробуйте позже. Завершение работы.");
+                System.exit(0);
+            }
 
             while (true){
                 try {
@@ -64,7 +74,9 @@ public class ClientApp {
         }
         catch(Exception e){
             System.out.println("Что-то пошло не так в ходе выполнения программы.");
-            System.out.println(e.getMessage());
+//            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            System.out.println(Arrays.toString(e.getStackTrace()));
         }
     }
 }

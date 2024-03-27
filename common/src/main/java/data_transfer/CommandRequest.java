@@ -12,4 +12,9 @@ public class CommandRequest extends Request {
     public Command getCommand() {
         return command;
     }
+
+    @Override
+    public Object getContent() {
+        return getCommand();
+    }
 }

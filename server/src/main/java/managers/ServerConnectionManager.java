@@ -1,16 +1,18 @@
 package managers;
 
-import common.commands.abstractions.Command;
-import data_transfer.CommandRequest;
-import data_transfer.CommandResponse;
-import data_transfer.Serializer;
+import data_transfer.*;
+import exceptions.FinishConnecton;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.Arrays;
+import static common.Utils.concatBytes;
 
 public class ServerConnectionManager {
     private final int PACKET_SIZE = 1024;
+    private final int DATA_SIZE = PACKET_SIZE - 1;
+    private final Logger logger;
 
     protected final int port;
     private InetSocketAddress localSocketAddress;
@@ -25,55 +27,127 @@ public class ServerConnectionManager {
         localSocketAddress = new InetSocketAddress(port);
         socket = new DatagramSocket(localSocketAddress);
 
-        System.out.println("Старт сервера, порт: " + port);
+        logger = handler.vals.logger;
+
+        logger.info("Инициализация сервера, порт: " + port);
+//        System.out.println("Старт сервера, порт: " + port);
     }
 
-    protected Command getNextRequest() throws IOException {
+    protected Request getNextRequest() throws IOException {
         boolean received = false;
+        byte[] result = new byte[PACKET_SIZE];
+        SocketAddress address = null;
 
-        byte[] buf = new byte[PACKET_SIZE];
-        DatagramPacket dp = new DatagramPacket(buf, PACKET_SIZE);
-
+        // получение пакетов в один запрос.
+        // запрос кончается байтом "1", пока он не получится, пакеты будут суммироваться
         while(!received) {
-            socket.receive(dp);
+            byte[] buf = new byte[PACKET_SIZE];
+            DatagramPacket dp = new DatagramPacket(buf, PACKET_SIZE);
 
-            // logging
+            socket.receive(dp);
+            if (address == null){
+                address = dp.getSocketAddress();
+            } else if (!dp.getSocketAddress().equals(address)){
+                logger.warn("Получен пакет от другого источника");
+                sendResponse(new ConnectionResponse(false), dp.getSocketAddress());
+                continue;
+            }
+
+            logger.info("Получен пакет от " + address);
 
             if (buf[buf.length - 1] == 1){
                 received = true;
+                logger.info("Получение данных от " + address + " окончено");
             }
-        }
-        if (curClient == null){
-            curClient = dp.getSocketAddress();
+            System.out.println("4");
+            result = concatBytes(result, Arrays.copyOf(buf, buf.length - 1));
+            System.out.println("3");
         }
 
-        CommandRequest cr = (CommandRequest) Serializer.deserializeData(buf);
-        return cr.getCommand();
+        Request data = (Request) Serializer.deserializeData(result); // полученные данные
+
+        logger.info("Данные - " + data);
+
+        // если сейчас сервер не занят, и новый запрос - это запрос о подключении, то этот клиент устанавливается текущим;
+        // отправляется ответ об успешном подключении
+        if (curClient == null && data instanceof ConnectionRequest){
+            System.out.println("1");
+
+            curClient = address;
+            ((ConnectionRequest) data).setSuccess(true);
+            sendResponse(new ConnectionResponse(true), address);
+            logger.info("Установлено подключение с клиентом " + curClient);
+
+            return data;
+        }
+        // если сервер занят, и запрос пришел от другого клиента, ему отправляется ответ о занятости сервера
+        else if (!curClient.equals(address)){
+            System.out.println("2");
+            sendResponse(new ConnectionResponse(false), address);
+            logger.warn("Получен запрос от другого источника. Запрос игнорируется ");
+            return null;
+        }
+
+        return data;
     }
 
-    protected void sendResponse(String response){
-        CommandResponse cr = new CommandResponse(response);
-        byte[] buf = Serializer.prepareData(cr);
+    protected void sendResponse(Response response, SocketAddress destination){
+        byte[] buf = Serializer.prepareData(response);
 
-        DatagramPacket dp = new DatagramPacket(buf, buf.length, curClient);
         try {
-            socket.send(dp);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println(Arrays.toString(e.getStackTrace()));
-        }
-    }
+            byte[][] chunks = new byte[(int) Math.ceil(buf.length / (double) DATA_SIZE)][DATA_SIZE];
 
-    protected void workoutConnection(){
-        ;
+            int start = 0;
+            for (int i = 0; i < chunks.length; i++) {
+                chunks[i] = Arrays.copyOfRange(buf, start, start + DATA_SIZE);
+                start += DATA_SIZE;
+            }
+
+            logger.info("Отправляется " + chunks.length + " чанков клиенту " + destination);
+
+            for (int i = 0; i < chunks.length; i++) {
+                var chunk = chunks[i];
+                if (i == chunks.length - 1) {
+                    DatagramPacket dp = new DatagramPacket(concatBytes(chunk, new byte[]{1}), PACKET_SIZE, destination);
+                    socket.send(dp);
+                    logger.info("Последний чанк размером " + chunk.length + " отправлен");
+                } else {
+                    var dp = new DatagramPacket(concatBytes(chunk, new byte[]{0}), PACKET_SIZE, destination);
+                    socket.send(dp);
+                    logger.info("Чанк размером " + chunk.length + " отправлен");
+                }
+            }
+
+            logger.info("Отправка данных клиенту" + destination + " завершена");
+
+        } catch (IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     public void run(){
+        Request request;
+        // в бесконечном цикле принимаем подключения, если нашли, прорабатываем его до конца
         while (true){
             try {
-                getNextRequest()
+                if ((request = getNextRequest()) == null){
+                    continue;
+                } else if (request instanceof ConnectionRequest && ((ConnectionRequest) request).isSuccess()) {
+                    logger.info("Подключение клиента к серверу, адрес: " + curClient);
+                } else {
+                    try {
+                        handler.nextCommand(((CommandRequest) request).getCommand());
+                        String result = handler.vals.getServerOutputManager().getResponse();
+                        sendResponse(new Response(result), curClient);
+                    } catch (FinishConnecton e){
+                        sendResponse(new Response("Конец работы. Отключение от сервера."), curClient);
+                        curClient = null;
+
+                        logger.info("Отключение клиента от сервера.");
+                    }
+                }
             } catch (IOException e){
-                ;
+                System.out.println(e);
             }
         }
     }

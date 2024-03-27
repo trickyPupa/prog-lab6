@@ -4,6 +4,7 @@ import common.abstractions.*;
 import common.exceptions.NoSuchCommandException;
 import common.commands.abstractions.Command;
 import common.commands.implementations.*;
+import data_transfer.CommandRequest;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class ClientCommandHandler implements Handler {
         }
         Command currentCommand = commands.get(commandName).apply(args);
 
-        ArrayList<Class> a = new ArrayList<>();
+        ArrayList<Class<? extends Command>> a = new ArrayList<>();
         a.add(AddCommand.class);
         a.add(UpdateCommand.class);
         a.add(RemoveLowerCommand.class);
@@ -86,10 +87,10 @@ public class ClientCommandHandler implements Handler {
         // сериализовать команду
 
         // отправить запрос серверу
-        clientRequestManager.makeRequest(currentCommand);
+        clientRequestManager.makeRequest(new CommandRequest(currentCommand));
 
         // получить ответ сервера
-        String result = clientRequestManager.getResponse();
+        String result = clientRequestManager.getResponse().getMessage();
 
         outputManager.print(result);
     }

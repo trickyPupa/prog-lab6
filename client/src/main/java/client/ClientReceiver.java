@@ -27,7 +27,7 @@ public class ClientReceiver extends AbstractReceiver {
 
     @Override
     public void exit(Object[] args) {
-        super.exit(args);
+        System.exit(0);
     }
 
     @Override

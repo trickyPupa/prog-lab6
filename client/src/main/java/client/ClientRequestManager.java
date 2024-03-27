@@ -1,10 +1,12 @@
 package client;
 
 import data_transfer.CommandRequest;
-import data_transfer.CommandResponse;
+import data_transfer.Request;
+import data_transfer.Response;
 import data_transfer.Serializer;
 import exceptions.ConnectionsFallsExcetion;
 import common.commands.abstractions.Command;
+import static common.Utils.concatBytes;
 
 import java.io.IOException;
 import java.net.*;
@@ -13,6 +15,9 @@ import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 
 public class ClientRequestManager extends AbstractClientRequestManager {
+    private final int PACKET_SIZE = 1024;
+    private final int DATA_SIZE = PACKET_SIZE - 1;
+
     private DatagramSocket socket;
     private SocketAddress socketAddress;
     private DatagramChannel channel;
@@ -49,14 +54,34 @@ public class ClientRequestManager extends AbstractClientRequestManager {
     }
 
     @Override
-    public void makeRequest(Command c){
-        CommandRequest cr  = new CommandRequest(c);
-        byte[] preparedData = Serializer.prepareData(cr);
-        ByteBuffer buf = ByteBuffer.allocate(preparedData.length);
-        buf.put(preparedData);
+    public void makeRequest(Request request) {
+        byte[] preparedData = Serializer.prepareData(request);
+
+        byte[][] chunks = new byte[(int)Math.ceil(preparedData.length / (double)DATA_SIZE)][DATA_SIZE];
+
+        int start = 0;
+        for(int i = 0; i < chunks.length; i++) {
+            chunks[i] = Arrays.copyOfRange(preparedData, start, start + DATA_SIZE);
+            start += DATA_SIZE;
+        }
 
         try {
-            channel.write(buf);
+            for(int i = 0; i < chunks.length; i++) {
+                var chunk = chunks[i];
+                if (i == chunks.length - 1) {
+                    byte[] lastChunk = concatBytes(chunk, new byte[]{1});
+
+                    channel.send(ByteBuffer.wrap(lastChunk), socketAddress);
+                } else {
+                    byte[] res = concatBytes(chunk, new byte[]{0});
+
+                    channel.send(ByteBuffer.wrap(res), socketAddress);
+                }
+            }
+
+            ByteBuffer buf = ByteBuffer.allocate(preparedData.length);
+            buf.put(preparedData);
+
         } catch (IOException e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
             System.out.println(e.getMessage());
@@ -64,23 +89,29 @@ public class ClientRequestManager extends AbstractClientRequestManager {
     }
 
     @Override
-    public String getResponse(){
-        ByteBuffer buf = ByteBuffer.allocate(1000);
+    public Response getResponse(){
+        boolean received = false;
+        byte[] data = new byte[0];
 
         try {
-            channel.receive(buf);
-            CommandResponse cr = (CommandResponse) Serializer.deserializeData(buf.array());
-            return cr.getMessage();
-        } catch (IOException e) {
+            while (!received) {
+                ByteBuffer buf = ByteBuffer.allocate(PACKET_SIZE);
+                SocketAddress addr = null;
+
+                while (addr == null)
+                    addr = channel.receive(buf);
+
+                if (buf.array()[PACKET_SIZE - 1] == 1) {
+                    received = true;
+                }
+
+                data = concatBytes(data, Arrays.copyOf(buf.array(), DATA_SIZE));
+            }
+
+            Response cr = (Response) Serializer.deserializeData(data);
+            return cr;
+        } catch (IOException e){
             throw new RuntimeException(e);
         }
-    }
-
-    public static void makeRequest(Command c, InetAddress addr, int port){
-        ;
-    }
-
-    public static String getResponse(InetAddress addr, int port){
-        return "";
     }
 }

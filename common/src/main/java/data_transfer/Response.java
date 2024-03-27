@@ -2,5 +2,14 @@ package data_transfer;
 
 import java.io.Serializable;
 
-public abstract class Response implements Serializable {
+public class Response implements Serializable {
+    protected String message = null;
+
+    public Response(String msg) {
+        message = msg;
+    }
+
+    public String getMessage(){
+        return message;
+    }
 }

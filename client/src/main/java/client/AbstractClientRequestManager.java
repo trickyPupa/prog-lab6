@@ -1,7 +1,10 @@
 package client;
 
 import common.commands.abstractions.Command;
+import data_transfer.Request;
+import data_transfer.Response;
 
+import java.io.IOException;
 import java.net.InetAddress;
 
 public abstract class AbstractClientRequestManager {
@@ -13,7 +16,7 @@ public abstract class AbstractClientRequestManager {
         port = p;
     }
 
-    public abstract void makeRequest(Command c);
+    public abstract void makeRequest(Request request);
 
-    public abstract String getResponse();
+    public abstract Response getResponse();
 }

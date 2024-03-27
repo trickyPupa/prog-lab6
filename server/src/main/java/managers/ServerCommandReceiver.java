@@ -7,6 +7,7 @@ import common.commands.abstractions.AbstractCommand;
 import common.commands.abstractions.Command;
 import common.model.entities.Movie;
 import common.exceptions.WrongArgumentException;
+import exceptions.FinishConnecton;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
     // подумать
     @Override
     public void exit(Object[] args) {
-        ;
+        throw new FinishConnecton();
     }
 
     // сделать красивый вывод

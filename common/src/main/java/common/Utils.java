@@ -42,4 +42,14 @@ public class Utils {
             return false;
         }
     }
+
+    public static byte[] concatBytes(byte[] a, byte[] b){
+        int l = a.length + b.length;
+        byte[] res = new byte[l];
+
+        for (int i = 0; i < l;i++){
+            res[i] = i < a.length ? a[i] : b[i - a.length];
+        }
+        return res;
+    }
 }
