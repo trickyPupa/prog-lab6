@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class ExitCommand extends AbstractCommand {
 
@@ -15,6 +16,6 @@ public class ExitCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.exit(getArgs());
+        rec.exit(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

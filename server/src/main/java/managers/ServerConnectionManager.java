@@ -35,7 +35,7 @@ public class ServerConnectionManager {
 
     protected Request getNextRequest() throws IOException {
         boolean received = false;
-        byte[] result = new byte[PACKET_SIZE];
+        byte[] result = new byte[0];
         SocketAddress address = null;
 
         // получение пакетов в один запрос.
@@ -59,30 +59,24 @@ public class ServerConnectionManager {
                 received = true;
                 logger.info("Получение данных от " + address + " окончено");
             }
-            System.out.println("4");
             result = concatBytes(result, Arrays.copyOf(buf, buf.length - 1));
-            System.out.println("3");
         }
 
         Request data = (Request) Serializer.deserializeData(result); // полученные данные
 
-        logger.info("Данные - " + data);
-
         // если сейчас сервер не занят, и новый запрос - это запрос о подключении, то этот клиент устанавливается текущим;
         // отправляется ответ об успешном подключении
         if (curClient == null && data instanceof ConnectionRequest){
-            System.out.println("1");
 
             curClient = address;
             ((ConnectionRequest) data).setSuccess(true);
             sendResponse(new ConnectionResponse(true), address);
-            logger.info("Установлено подключение с клиентом " + curClient);
+//            logger.info("Установлено подключение с клиентом " + curClient);
 
             return data;
         }
         // если сервер занят, и запрос пришел от другого клиента, ему отправляется ответ о занятости сервера
         else if (!curClient.equals(address)){
-            System.out.println("2");
             sendResponse(new ConnectionResponse(false), address);
             logger.warn("Получен запрос от другого источника. Запрос игнорируется ");
             return null;
@@ -121,6 +115,7 @@ public class ServerConnectionManager {
             logger.info("Отправка данных клиенту" + destination + " завершена");
 
         } catch (IOException e){
+            logger.error(e.getMessage() +  ": " + Arrays.toString(e.getStackTrace()));
             throw new RuntimeException(e);
         }
     }
@@ -128,27 +123,29 @@ public class ServerConnectionManager {
     public void run(){
         Request request;
         // в бесконечном цикле принимаем подключения, если нашли, прорабатываем его до конца
-        while (true){
-            try {
-                if ((request = getNextRequest()) == null){
-                    continue;
-                } else if (request instanceof ConnectionRequest && ((ConnectionRequest) request).isSuccess()) {
-                    logger.info("Подключение клиента к серверу, адрес: " + curClient);
-                } else {
-                    try {
-                        handler.nextCommand(((CommandRequest) request).getCommand());
-                        String result = handler.vals.getServerOutputManager().getResponse();
-                        sendResponse(new Response(result), curClient);
-                    } catch (FinishConnecton e){
-                        sendResponse(new Response("Конец работы. Отключение от сервера."), curClient);
-                        curClient = null;
+        try {
+            if ((request = getNextRequest()) == null){
+                return;
+            } else if (request instanceof ConnectionRequest && ((ConnectionRequest) request).isSuccess()) {
+                logger.info("Подключение клиента к серверу, адрес: " + curClient);
+            } else {
+                try {
+                    handler.nextCommand(((CommandRequest) request).getCommand());
 
-                        logger.info("Отключение клиента от сервера.");
-                    }
+                    handler.receiver.save(null);
+
+                    String result = handler.vals.getServerOutputManager().popResponce();
+                    sendResponse(new Response(result), curClient);
+                } catch (FinishConnecton e){
+                    sendResponse(new Response("Конец работы. Отключение от сервера."), curClient);
+                    curClient = null;
+
+                    logger.info("Отключение клиента от сервера.");
                 }
-            } catch (IOException e){
-                System.out.println(e);
             }
+        } catch (IOException e){
+            logger.error(e.getMessage() +  ": " + Arrays.toString(e.getStackTrace()));
+            throw new RuntimeException(e);
         }
     }
 }

@@ -57,14 +57,15 @@ public class ClientApp {
                     outputManager.print("Нет такой команды в доступных.");
                 } catch (RecursionException e) {
                     outputManager.print("Рекурсия в исполняемом файле.");
-                } catch (RuntimeException e){
-                    outputManager.print(e.getMessage());
-                    System.out.println("main catch runtime");
                 }
+//                catch (RuntimeException e){
+//                    outputManager.print(e.getMessage());
+//                    System.out.println("main catch runtime");
+//                }
             }
         }
         catch (UnknownHostException e){
-            ;
+            throw new RuntimeException(e);
         }
         catch(IOException e){
             System.out.println("Ошибка при чтении данных");

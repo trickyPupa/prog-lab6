@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class RemoveFirstCommand extends AbstractCommand {
     public RemoveFirstCommand(Object[] arg) {
@@ -16,6 +17,6 @@ public class RemoveFirstCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeFirst(getArgs());
+        rec.removeFirst(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

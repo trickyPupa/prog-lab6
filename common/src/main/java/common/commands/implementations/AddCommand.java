@@ -1,8 +1,9 @@
 package common.commands.implementations;
 
+import common.Utils;
 import common.abstractions.DataInputReceiver;
 import common.commands.abstractions.AbstractCommand;
-import common.abstractions.AbstractReceiver;
+import common.abstractions.AbstractReceiver;import common.Utils;
 
 public class AddCommand extends AbstractCommand{
 
@@ -34,7 +35,7 @@ public class AddCommand extends AbstractCommand{
 
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.add(getArgs());
+        rec.add(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 
 }

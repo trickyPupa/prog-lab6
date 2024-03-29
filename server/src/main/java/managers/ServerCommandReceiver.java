@@ -1,7 +1,7 @@
 package managers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import common.abstractions.AbstractReceiver;
+import common.abstractions.AbstractReceiver;import common.Utils;
 import common.abstractions.IOutputManager;
 import common.commands.abstractions.AbstractCommand;
 import common.commands.abstractions.Command;
@@ -9,10 +9,11 @@ import common.model.entities.Movie;
 import common.exceptions.WrongArgumentException;
 import exceptions.FinishConnecton;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Vector;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static common.Utils.isInt;
 
@@ -26,7 +27,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
 
     @Override
     public void add(Object[] args) {
-        shell.getCollectionManager().add((Movie) args[0]);
+        shell.getCollectionManager().add((Movie) args[1]);
     }
 
     @Override
@@ -68,34 +69,36 @@ public class ServerCommandReceiver extends AbstractReceiver {
         }
     }
 
-    // изменить
+    // хорошо подумать
     @Override
     public void executeScript(Object[] args) {
         super.executeScript(args);
     }
 
+    private int checkRecursion(Path path, ArrayDeque<Path> stack, int j) throws IOException {
+        int i = 0;
+
+        if (stack.contains(path)) return j;
+        stack.addLast(path);
+        String str = Files.readString(path);
+
+        Pattern pattern = Pattern.compile("execute_script .*");
+        var patternMatcher = pattern.matcher(str);
+        while (patternMatcher.find())
+        {
+            i++;
+            Path newPath = Path.of(patternMatcher.group().split(" ")[1]);
+//            if(checkRecursion(newPath, stack, i) != 0) return i;
+            int a = checkRecursion(newPath, stack, i);
+            if (a != 0) return a + j;
+        }
+        stack.removeLast();
+        return 0;
+    }
+
     // проверить
     @Override
     public void filterByGoldenPalmCount(Object[] args) {
-//        if (!isInt(args[0])){
-////            shell.getOutputManager().print("Некорректные аргументы.");
-//            throw new WrongArgumentException("filter_by_golden_palm_count");
-//        }
-//        Integer gp_count = Integer.parseInt(args[0]);
-//
-//        Vector<Movie> collection = shell.getCollectionManager().getCollection();
-//
-//        if (collection.isEmpty()){
-//            shell.getOutputManager().print("Коллекция пуста.");
-//            return;
-//        }
-//
-//        for (Movie i : collection){
-//            if (Objects.equals(i.getGoldenPalmCount(), gp_count)){
-//                shell.getOutputManager().print(i.toString());
-//            }
-//        }
-
         // проверка аргументов
         Integer gp_count = Integer.parseInt((String) args[0]);
 
@@ -218,7 +221,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
             return;
         }
 
-        Movie elem = (Movie) args[0];
+        Movie elem = (Movie) args[1];
 
         collection.stream()
                 .filter((x) -> x.compareTo(elem) < 0)
@@ -230,16 +233,16 @@ public class ServerCommandReceiver extends AbstractReceiver {
 
     @Override
     public void update(Object[] args) {
-        if (!isInt((String) args[0])){
+        if (!isInt((String) args[1])){
 //            shell.getOutputManager().print("Некорректные аргументы.");
             throw new WrongArgumentException("update");
         }
-        int id = Integer.parseInt((String) args[0]);
+        int id = Integer.parseInt((String) args[1]);
 
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
         for (Movie i : collection){
             if (i.getId() == id){
-                i.update((Movie) args[1]);
+                i.update((Movie) args[2]);
                 shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
                 return;
             }

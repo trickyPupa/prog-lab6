@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class MinByCoordinatesCommand extends AbstractCommand {
     public MinByCoordinatesCommand(Object[] args) {
@@ -15,6 +16,6 @@ public class MinByCoordinatesCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.minByCoordinates(getArgs());
+        rec.minByCoordinates(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

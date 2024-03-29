@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class RemoveLowerCommand extends AbstractCommand {
     public RemoveLowerCommand(Object[] args) {
@@ -15,6 +16,6 @@ public class RemoveLowerCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeLower(getArgs());
+        rec.removeLower(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

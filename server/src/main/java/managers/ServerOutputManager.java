@@ -18,4 +18,10 @@ public class ServerOutputManager implements IOutputManager {
     public String getResponse(){
         return response;
     }
+
+    public String popResponce(){
+        String s = response;
+        response = "";
+        return s;
+    }
 }

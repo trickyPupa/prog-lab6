@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
+import common.Utils;
 import common.abstractions.AbstractReceiver;
+import common.commands.abstractions.AbstractCommand;
 
 public class ClearCommand extends AbstractCommand {
     public ClearCommand(Object[] args){
@@ -14,6 +15,6 @@ public class ClearCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.clear(getArgs());
+        rec.clear(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

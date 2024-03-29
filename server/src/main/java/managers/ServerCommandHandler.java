@@ -5,6 +5,7 @@ import common.commands.abstractions.Command;
 import common.commands.implementations.*;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,7 +13,7 @@ import java.util.function.Function;
 /**
  * Класс - обработчик команд программы; считывает команды и вызывает их.
  */
-public class ServerCommandHandler {
+public class ServerCommandHandler implements Handler{
     public class ShellValuables {
         private ServerOutputManager serverOutputManager;
         private final HistoryManager historyManager;
@@ -58,7 +59,6 @@ public class ServerCommandHandler {
 
         {
             vals.commands.put("help", HelpCommand::new);
-            vals.commands.put("save", SaveCommand::new);
             vals.commands.put("exit", ExitCommand::new);
             vals.commands.put("add", AddCommand::new);
             vals.commands.put("show", ShowCommand::new);
@@ -80,5 +80,15 @@ public class ServerCommandHandler {
 
         currentCommand.execute(receiver);
         vals.getHistoryManager().next(currentCommand);
+    }
+
+    @Override
+    public void nextCommand() throws IOException {
+
+    }
+
+    @Override
+    public void nextCommand(String commandName) {
+
     }
 }

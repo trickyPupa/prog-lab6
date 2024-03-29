@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class ShowCommand extends AbstractCommand {
     public ShowCommand(Object[] args) {
@@ -14,6 +15,6 @@ public class ShowCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.show(getArgs());
+        rec.show(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

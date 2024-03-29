@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class HistoryCommand extends AbstractCommand {
     public HistoryCommand(Object[] args) {
@@ -15,6 +16,6 @@ public class HistoryCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.history(getArgs());
+        rec.history(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

@@ -6,6 +6,8 @@ import data_transfer.Response;
 import data_transfer.Serializer;
 import exceptions.ConnectionsFallsExcetion;
 import common.commands.abstractions.Command;
+import org.w3c.dom.ls.LSOutput;
+
 import static common.Utils.concatBytes;
 
 import java.io.IOException;

@@ -52,4 +52,14 @@ public class Utils {
         }
         return res;
     }
+
+    public static Object[] concatObjects(Object[] a, Object[] b){
+        int l = a.length + b.length;
+        Object[] res = new Object[l];
+
+        for (int i = 0; i < l;i++){
+            res[i] = i < a.length ? a[i] : b[i - a.length];
+        }
+        return res;
+    }
 }

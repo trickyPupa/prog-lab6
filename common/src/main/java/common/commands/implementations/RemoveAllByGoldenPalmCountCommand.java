@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class RemoveAllByGoldenPalmCountCommand extends AbstractCommand {
     public RemoveAllByGoldenPalmCountCommand(Object[] args) {
@@ -16,6 +17,6 @@ public class RemoveAllByGoldenPalmCountCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeAllByGoldenPalmCount(getArgs());
+        rec.removeAllByGoldenPalmCount(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class RemoveByIdCommand extends AbstractCommand {
     public RemoveByIdCommand(Object[] args) {
@@ -15,6 +16,6 @@ public class RemoveByIdCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeById(getArgs());
+        rec.removeById(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

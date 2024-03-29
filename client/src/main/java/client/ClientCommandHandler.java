@@ -6,10 +6,7 @@ import common.commands.abstractions.Command;
 import common.commands.implementations.*;
 import data_transfer.CommandRequest;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -74,20 +71,20 @@ public class ClientCommandHandler implements Handler {
         }
         Command currentCommand = commands.get(commandName).apply(args);
 
-        ArrayList<Class<? extends Command>> a = new ArrayList<>();
-        a.add(AddCommand.class);
-        a.add(UpdateCommand.class);
-        a.add(RemoveLowerCommand.class);
+//        ArrayList<Class<? extends Command>> a = new ArrayList<>();
+//        a.add(AddCommand.class);
+//        a.add(UpdateCommand.class);
+//        a.add(RemoveLowerCommand.class);
 
-        if (a.contains(currentCommand.getClass()))
-            currentCommand.execute(dataInputReceiver);
-        else
+        // обработать команду и отправить запрос серверу
+
+        if (currentCommand.getClass() == ExitCommand.class){
+            clientRequestManager.makeRequest(new CommandRequest(currentCommand));
             currentCommand.execute(simpleReceiver);
-
-        // сериализовать команду
-
-        // отправить запрос серверу
-        clientRequestManager.makeRequest(new CommandRequest(currentCommand));
+        } else{
+            currentCommand.execute(simpleReceiver);
+            clientRequestManager.makeRequest(new CommandRequest(currentCommand));
+        }
 
         // получить ответ сервера
         String result = clientRequestManager.getResponse().getMessage();

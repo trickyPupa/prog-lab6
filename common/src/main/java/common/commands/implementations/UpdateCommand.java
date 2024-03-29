@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class UpdateCommand extends AbstractCommand {
     public UpdateCommand(Object[] args) {
@@ -15,6 +16,6 @@ public class UpdateCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.update(getArgs());
+        rec.update(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }

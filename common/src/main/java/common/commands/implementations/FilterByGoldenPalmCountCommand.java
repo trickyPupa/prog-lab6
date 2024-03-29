@@ -1,7 +1,8 @@
 package common.commands.implementations;
 
-import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.Utils;
+import common.commands.abstractions.AbstractCommand;
 
 public class FilterByGoldenPalmCountCommand extends AbstractCommand {
     public FilterByGoldenPalmCountCommand(Object[] args) {
@@ -16,6 +17,6 @@ public class FilterByGoldenPalmCountCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.filterByGoldenPalmCount(getArgs());
+        rec.filterByGoldenPalmCount(Utils.concatObjects(new Object[] {this}, getArgs()));
     }
 }
