@@ -1,17 +1,11 @@
-import common.OutputManager;
 import common.Utils;
 import common.abstractions.IOutputManager;
-import data_transfer.ConnectionRequest;
-import data_transfer.Serializer;
+import network.ConnectionRequest;
+import network.Serializer;
 import managers.*;
-import common.exceptions.InterruptException;
-import common.exceptions.NoSuchCommandException;
-import common.exceptions.RecursionException;
-import common.exceptions.WrongArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.event.ContainerAdapter;
 import java.net.SocketException;
 import java.util.Arrays;
 
@@ -58,22 +52,13 @@ public class ServerApp {
         while (true){
             try {
                 serverConnectionManager.run();
-
-            } catch (WrongArgumentException e){
-                outputManager.print(e.toString());
-            } catch (InterruptException e){
-                outputManager.print("Ввод данных остановлен.");
-            } catch (NoSuchCommandException e){
-                outputManager.print("Нет такой команды в доступных.");
-//                    outputManager.print(e.getMessage());
-            } catch (RecursionException e) {
-                outputManager.print("Рекурсия в исполняемом файле.");
             }
-//            catch (RuntimeException e){
+            catch (RuntimeException e){
 //                outputManager.print(e);
-//                System.out.println(e);
-//                System.out.println("main catch runtime");
-//            }
+                System.out.println(e);
+                System.out.println("main catch runtime");
+                logger.error(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+            }
         }
     }
 }

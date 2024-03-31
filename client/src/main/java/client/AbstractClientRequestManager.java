@@ -1,10 +1,8 @@
 package client;
 
-import common.commands.abstractions.Command;
-import data_transfer.Request;
-import data_transfer.Response;
+import network.Request;
+import network.Response;
 
-import java.io.IOException;
 import java.net.InetAddress;
 
 public abstract class AbstractClientRequestManager {

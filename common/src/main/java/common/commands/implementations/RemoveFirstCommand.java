@@ -17,6 +17,6 @@ public class RemoveFirstCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeFirst(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.removeFirst(getArgs());
     }
 }

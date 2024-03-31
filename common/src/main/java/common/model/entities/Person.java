@@ -47,99 +47,7 @@ public class Person implements Comparable<Person>, Checkable {
         this.location = location;
     }
 
-    @Deprecated
     public static Person createPerson(IInputManager input, IOutputManager output){
-        Person elem = new Person();
-
-        try{
-            while (true) {
-                try {
-                    output.print("\nВведите имя режиссёра и дату его рождения (ДД.ММ.ГГГГ) через запятую: ");
-                    String[] args = input.nextLine().split(",");
-
-                    if (!args[0].isBlank()) {
-                        elem.setName(args[0].strip());
-                    } else {
-                        output.print("Имя не может быть пустым.");
-                        continue;
-                    }
-                    if (args[1].strip().matches("(0[1-9]|[12][0-9]|3[01]).(0[1-9]|1[012]).(1[89]\\d\\d|20([01]\\d|2[01234]))")) {
-                        String[] temp = args[1].split("\\.");
-
-                        int day = Integer.parseInt(temp[0].strip());
-                        int month = Integer.parseInt(temp[1].strip());
-                        int year = Integer.parseInt(temp[2].strip());
-
-                        elem.setBirthday(new Date(year, month, day));
-                        break;
-                    } else {
-                        output.print("Неправильный формат даты.");
-                    }
-                } catch (RuntimeException e){
-                    output.print(e.getMessage());
-                    output.print("Неправильный формат аргументов");
-                }
-            }
-
-            while (true) {
-                output.print("\nЦвет глаз режиссёра - BLUE, YELLOW, ORANGE, WHITE или BROWN: ");
-                String color = input.nextLine().strip();
-                if (EyeColor.contains(color)){
-                    elem.setEyeColor(EyeColor.valueOf(color));
-                    break;
-                } else{
-                    output.print("Недопустимый цвет глаз.");
-                }
-            }
-
-            while (true) {
-                output.print("\nЦвет волос режиссёра - GREEN, RED, BLUE, YELLOW или ORANGE: ");
-                String color = input.nextLine().strip();
-                if (HairColor.contains(color)){
-                    elem.setHairColor(HairColor.valueOf(color));
-                    break;
-                } else{
-                    output.print("Недопустимый цвет глаз.");
-                }
-            }
-
-            while (true) {
-                output.print("\nСтрана рождения режиссёра - FRANCE, INDIA, VATICAN или THAILAND: ");
-                String line = input.nextLine().strip();
-                if (Country.contains(line)){
-                    elem.setNationality(Country.valueOf(line));
-                    break;
-                } else{
-                    output.print("Недопустимая страна.");
-                }
-            }
-
-            while (true) {
-                output.print("\nМестонахождение режиссёра - дробное число и два целых через запятую: ");
-                try {
-                    String[] line = input.nextLine().strip().replace(" ", "").split(",");
-
-                    if (line[0].matches("-?\\d*.\\d*") && line[1].matches("-?\\d*")
-                            && line[2].matches("-?\\d*")) {
-                        elem.setLocation(new Location(Float.parseFloat(line[0]), Long.parseLong(line[1]),
-                                Integer.parseInt(line[2])));
-                        break;
-                    } else {
-                        output.print("Недопустимый формат.");
-                    }
-                } catch (RuntimeException e){
-                    System.out.println(e.getMessage());
-                    System.out.println("Неправильный формат аргументов.");
-                }
-            }
-            return elem;
-        } catch (IOException e){
-            output.print("Что-то случилось, введите команду заново.");
-            throw new InterruptException();
-        }
-    }
-
-    public static Person createPerson1(IInputManager input, IOutputManager output){
         Person elem = new Person();
 
         Map<String, Predicate<String>> args_checkers = new LinkedHashMap<>();
@@ -150,7 +58,7 @@ public class Person implements Comparable<Person>, Checkable {
             }
             return false;
         });
-        args_checkers.put("дату рождения режиссёра", x -> {
+        args_checkers.put("дату рождения режиссёра в формате ДД.ММ.ГГГГ", x -> {
             if (x.matches("(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.(1[89]\\d\\d|20([01]\\d|2[01234]))")){
 
                 String[] temp = x.split("\\.");
@@ -165,22 +73,22 @@ public class Person implements Comparable<Person>, Checkable {
             return false;
         });
         args_checkers.put("цвет глаз режиссёра (BLUE, YELLOW, ORANGE, WHITE, BROWN)", x -> {
-            if (EyeColor.contains(x)){
-                elem.setEyeColor(EyeColor.valueOf(x));
+            if (EyeColor.contains(x.toUpperCase())){
+                elem.setEyeColor(EyeColor.valueOf(x.toUpperCase()));
                 return true;
             }
             return false;
         });
         args_checkers.put("цвет волос режиссёра (GREEN, RED, BLUE, YELLOW, ORANGE)", x -> {
-            if (HairColor.contains(x)){
-                elem.setHairColor(HairColor.valueOf(x));
+            if (HairColor.contains(x.toUpperCase())){
+                elem.setHairColor(HairColor.valueOf(x.toUpperCase()));
                 return true;
             }
             return false;
         });
         args_checkers.put("национальность режиссёра (FRANCE, INDIA, VATICAN, THAILAND)", x -> {
-            if (Country.contains(x)){
-                elem.setNationality(Country.valueOf(x));
+            if (Country.contains(x.toUpperCase())){
+                elem.setNationality(Country.valueOf(x.toUpperCase()));
                 return true;
             }
             return false;
@@ -191,7 +99,7 @@ public class Person implements Comparable<Person>, Checkable {
                 Predicate<String> check = args_checkers.get(a);
                 output.print("Введите " + a + ":");
                 String line = input.nextLine();
-                if (line == null || line.equals("exit")){
+                if (line == null || line.strip().equals("exit")){
                     throw new InterruptException();
                 }
 

@@ -1,4 +1,4 @@
-package data_transfer;
+package network;
 
 public class ConnectionResponse extends Response{
     protected boolean success;

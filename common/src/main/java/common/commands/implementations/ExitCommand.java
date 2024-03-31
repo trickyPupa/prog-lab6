@@ -16,6 +16,6 @@ public class ExitCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.exit(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.exit(getArgs());
     }
 }

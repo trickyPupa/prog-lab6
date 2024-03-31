@@ -16,6 +16,6 @@ public class MinByCoordinatesCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.minByCoordinates(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.minByCoordinates(getArgs());
     }
 }

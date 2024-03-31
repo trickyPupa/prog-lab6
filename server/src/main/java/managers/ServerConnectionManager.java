@@ -1,6 +1,9 @@
 package managers;
 
-import data_transfer.*;
+import common.exceptions.InterruptException;
+import common.exceptions.NoSuchCommandException;
+import common.exceptions.WrongArgumentException;
+import network.*;
 import exceptions.FinishConnecton;
 import org.apache.logging.log4j.Logger;
 
@@ -97,6 +100,8 @@ public class ServerConnectionManager {
                 start += DATA_SIZE;
             }
 
+            logger.info("Отправляются данные: \"" + response.getMessage().strip() + "\"");
+
             logger.info("Отправляется " + chunks.length + " чанков клиенту " + destination);
 
             for (int i = 0; i < chunks.length; i++) {
@@ -120,6 +125,13 @@ public class ServerConnectionManager {
         }
     }
 
+    protected void disconnect(){
+        handler.vals.getServerOutputManager().print("Конец работы. Отключение от сервера.");
+        curClient = null;
+
+        logger.info("Отключение клиента от сервера.");
+    }
+
     public void run(){
         Request request;
         // в бесконечном цикле принимаем подключения, если нашли, прорабатываем его до конца
@@ -128,22 +140,41 @@ public class ServerConnectionManager {
                 return;
             } else if (request instanceof ConnectionRequest && ((ConnectionRequest) request).isSuccess()) {
                 logger.info("Подключение клиента к серверу, адрес: " + curClient);
+            } else if (request instanceof DisconnectionRequest && curClient != null) {
+                disconnect();
             } else {
                 try {
                     handler.nextCommand(((CommandRequest) request).getCommand());
 
                     handler.receiver.save(null);
 
-                    String result = handler.vals.getServerOutputManager().popResponce();
-                    sendResponse(new Response(result), curClient);
-                } catch (FinishConnecton e){
-                    sendResponse(new Response("Конец работы. Отключение от сервера."), curClient);
-                    curClient = null;
+//                    String result = handler.vals.getServerOutputManager().popResponce();
+//                    sendResponse(new Response(result), curClient);
 
-                    logger.info("Отключение клиента от сервера.");
+                } catch (FinishConnecton e){
+                    disconnect();
+                } catch (WrongArgumentException e){
+                    logger.error("Некорректный формат команды: неправильный аргумент");
+                    handler.vals.getServerOutputManager().print(e.toString());
+                } catch (InterruptException e){
+                    handler.vals.getServerOutputManager().print("Ввод данных остановлен.");
+                } catch (NoSuchCommandException e) {
+                    logger.error("Несуществующая команда");
+                    handler.vals.getServerOutputManager().print(e.getMessage());
+                } finally {
+                    if (curClient != null) {
+                        String result = handler.vals.getServerOutputManager().popResponce();
+                        sendResponse(new Response(result), curClient);
+                    }
                 }
             }
         } catch (IOException e){
+            if (curClient != null) {
+                handler.vals.getServerOutputManager().print("Конец работы из-за ошибки [" + e + "] на сервере. Отключение от сервера.");
+                String result = handler.vals.getServerOutputManager().popResponce();
+                sendResponse(new Response(result), curClient);
+            }
+
             logger.error(e.getMessage() +  ": " + Arrays.toString(e.getStackTrace()));
             throw new RuntimeException(e);
         }

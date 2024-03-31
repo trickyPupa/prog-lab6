@@ -1,4 +1,4 @@
-package data_transfer;
+package network;
 
 public class ConnectionRequest extends Request {
     protected Boolean success = null;

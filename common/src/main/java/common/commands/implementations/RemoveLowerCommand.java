@@ -16,6 +16,6 @@ public class RemoveLowerCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeLower(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.removeLower(getArgs());
     }
 }

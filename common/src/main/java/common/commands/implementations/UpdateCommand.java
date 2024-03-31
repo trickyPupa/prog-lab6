@@ -16,6 +16,6 @@ public class UpdateCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.update(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.update(getArgs());
     }
 }

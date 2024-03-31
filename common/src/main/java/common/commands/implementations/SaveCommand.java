@@ -15,6 +15,6 @@ public class SaveCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.save(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.save(getArgs());
     }
 }

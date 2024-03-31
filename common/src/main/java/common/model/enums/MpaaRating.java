@@ -1,6 +1,8 @@
 package common.model.enums;
 
-public enum MpaaRating {
+import java.io.Serializable;
+
+public enum MpaaRating implements Serializable {
     PG,
     PG_13,
     NC_17;

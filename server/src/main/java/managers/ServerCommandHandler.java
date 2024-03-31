@@ -77,9 +77,11 @@ public class ServerCommandHandler implements Handler{
     }
 
     public void nextCommand(Command currentCommand) {
+        vals.logger.info("Выполняется команда " + currentCommand.getName());
 
         currentCommand.execute(receiver);
         vals.getHistoryManager().next(currentCommand);
+        vals.logger.info("Команда " + currentCommand.getName() + "выполнена");
     }
 
     @Override

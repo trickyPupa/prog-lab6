@@ -2,14 +2,15 @@ import client.*;
 import common.OutputManager;
 import common.abstractions.*;
 import common.exceptions.*;
-import data_transfer.ConnectionRequest;
-import data_transfer.ConnectionResponse;
-import data_transfer.Serializer;
+import network.ConnectionRequest;
+import network.ConnectionResponse;
+import network.DisconnectionRequest;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.PortUnreachableException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
@@ -58,14 +59,21 @@ public class ClientApp {
                 } catch (RecursionException e) {
                     outputManager.print("Рекурсия в исполняемом файле.");
                 }
-//                catch (RuntimeException e){
-//                    outputManager.print(e.getMessage());
-//                    System.out.println("main catch runtime");
-//                }
+                catch (RuntimeException e){
+                    outputManager.print(e.getMessage());
+                    System.out.println("main catch runtime");
+
+                    clientRequestManager.makeRequest(new DisconnectionRequest());
+                    receiver.exit(null);
+                }
             }
         }
         catch (UnknownHostException e){
+            System.out.println("Адрес сервера не найден");
             throw new RuntimeException(e);
+        }
+        catch(PortUnreachableException e){
+            System.out.println("Невозможно подключиться к заданному порту");
         }
         catch(IOException e){
             System.out.println("Ошибка при чтении данных");

@@ -50,10 +50,10 @@ public class CollectionManager extends AbstractCollectionManager<Movie> {
     @Override
     public String presentView(){
         if (collection.isEmpty()) return "Коллекция пуста";
-        String res = "Текущая коллекция фильмов:\n";
+        String res = "Текущая коллекция фильмов:";
 
         for (Movie i : collection){
-            res = res + " - " + i.toString() + "\n";
+            res = res + "\n - " + i.toString();
         }
 
         return res;

@@ -17,6 +17,6 @@ public class RemoveAllByGoldenPalmCountCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeAllByGoldenPalmCount(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.removeAllByGoldenPalmCount(getArgs());
     }
 }

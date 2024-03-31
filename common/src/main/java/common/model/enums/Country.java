@@ -1,6 +1,8 @@
 package common.model.enums;
 
-public enum Country {
+import java.io.Serializable;
+
+public enum Country implements Serializable {
     FRANCE,
     INDIA,
     VATICAN,

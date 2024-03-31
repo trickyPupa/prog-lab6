@@ -17,6 +17,6 @@ public class ExecuteScriptCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.executeScript(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.executeScript(getArgs());
     }
 }

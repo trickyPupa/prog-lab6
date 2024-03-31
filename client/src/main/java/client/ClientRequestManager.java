@@ -1,12 +1,9 @@
 package client;
 
-import data_transfer.CommandRequest;
-import data_transfer.Request;
-import data_transfer.Response;
-import data_transfer.Serializer;
+import network.Request;
+import network.Response;
+import network.Serializer;
 import exceptions.ConnectionsFallsExcetion;
-import common.commands.abstractions.Command;
-import org.w3c.dom.ls.LSOutput;
 
 import static common.Utils.concatBytes;
 

@@ -16,6 +16,6 @@ public class RemoveByIdCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.removeById(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.removeById(getArgs());
     }
 }

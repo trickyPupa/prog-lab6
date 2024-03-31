@@ -15,6 +15,6 @@ public class HelpCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.help(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.help(getArgs());
     }
 }

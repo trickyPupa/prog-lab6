@@ -15,6 +15,6 @@ public class ClearCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.clear(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.clear(getArgs());
     }
 }

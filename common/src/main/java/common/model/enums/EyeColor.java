@@ -1,6 +1,8 @@
 package common.model.enums;
 
-public enum EyeColor {
+import java.io.Serializable;
+
+public enum EyeColor implements Serializable {
     BLUE,
     YELLOW,
     ORANGE,

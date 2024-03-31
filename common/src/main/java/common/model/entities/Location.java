@@ -30,7 +30,7 @@ public class Location implements Checkable {
             int c;
 
             while(true) {
-                output.print("Введиите координату X локации режиссёра (число с плавающей точкой): ");
+                output.print("Введиите координату X локации режиссёра (число с плавающей точкой с количеством знаков <10^38): ");
                 String line = input.nextLine();
                 if (line == null || line.equals("exit")){
                     throw new InterruptException();
@@ -43,7 +43,7 @@ public class Location implements Checkable {
             }
 
             while(true) {
-                output.print("Введиите координату Y локации режиссёра (целое число): ");
+                output.print("Введиите координату Y локации режиссёра (целое число <9*10^18 и >-9*10^18): ");
                 String line = input.nextLine();
                 if (line == null || line.equals("exit")){
                     throw new InterruptException();
@@ -56,7 +56,7 @@ public class Location implements Checkable {
             }
 
             while(true) {
-                output.print("Введиите координату Z локации режиссёра (целое число): ");
+                output.print("Введиите координату Z локации режиссёра (целое число <2*10^9 и >-2*10^9): ");
                 String line = input.nextLine();
                 if (line == null || line.equals("exit")){
                     throw new InterruptException();

@@ -1,12 +1,16 @@
 package client;
 
+import common.Utils;
 import common.abstractions.*;
+import common.commands.abstractions.AbstractCommand;
 import common.exceptions.NoSuchCommandException;
 import common.commands.abstractions.Command;
 import common.commands.implementations.*;
-import data_transfer.CommandRequest;
+import jdk.jshell.execution.Util;
+import network.CommandRequest;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -70,13 +74,9 @@ public class ClientCommandHandler implements Handler {
             throw new NoSuchCommandException(line);
         }
         Command currentCommand = commands.get(commandName).apply(args);
+        currentCommand.setArgs(Utils.concatObjects(new Object[] {currentCommand}, currentCommand.getArgs()));
 
-//        ArrayList<Class<? extends Command>> a = new ArrayList<>();
-//        a.add(AddCommand.class);
-//        a.add(UpdateCommand.class);
-//        a.add(RemoveLowerCommand.class);
-
-        // обработать команду и отправить запрос серверу
+        // выполнение команды и отправка запроса серверу
 
         if (currentCommand.getClass() == ExitCommand.class){
             clientRequestManager.makeRequest(new CommandRequest(currentCommand));

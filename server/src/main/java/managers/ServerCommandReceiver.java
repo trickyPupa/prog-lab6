@@ -1,7 +1,7 @@
 package managers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import common.abstractions.AbstractReceiver;import common.Utils;
+import common.abstractions.AbstractReceiver;
 import common.abstractions.IOutputManager;
 import common.commands.abstractions.AbstractCommand;
 import common.commands.abstractions.Command;
@@ -96,11 +96,13 @@ public class ServerCommandReceiver extends AbstractReceiver {
         return 0;
     }
 
-    // проверить
     @Override
     public void filterByGoldenPalmCount(Object[] args) {
-        // проверка аргументов
-        Integer gp_count = Integer.parseInt((String) args[0]);
+        if (!isInt((String) args[1])){
+            throw new WrongArgumentException("filter_by_golden_palm_count");
+        }
+
+        Integer gp_count = Integer.parseInt((String) args[1]);
 
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
 
@@ -108,27 +110,31 @@ public class ServerCommandReceiver extends AbstractReceiver {
             shell.getServerOutputManager().print("Коллекция пуста.");
             return;
         }
-        shell.getServerOutputManager().print(collection.stream().filter((x) -> Objects.equals(x.getGoldenPalmCount(), gp_count)));
+        var a = collection.stream().filter((x) -> Objects.equals(x.getGoldenPalmCount(), gp_count)).toArray();
+        if (a.length == 0){
+            shell.getServerOutputManager().print("В коллекции нет элементов, соответствующих заданным фильтрам.");
+        } else{
+            Arrays.stream(a).forEach((x) -> shell.getServerOutputManager().print(x.toString()));
+        }
     }
 
-    // подумать как сделать и изменить на красивый вывод
     @Override
     public void help(Object[] args) {
         IOutputManager output = shell.getServerOutputManager();
         var commandsList = shell.commands;
 
-        output.print("Список доступных команд.");
+        output.print("Список доступных команд:");
         for (String name : commandsList.keySet()) {
-            String temp = String.format("%15s", name);
+            String temp = name;
             AbstractCommand curCmd = (AbstractCommand) commandsList.get(name).apply(null);
 
             if (!curCmd.getRequiringArguments().equals("no")) temp += " " + curCmd.getRequiringArguments();
 
-            output.print(String.format("\t%s: \t%s", temp, curCmd.getDescription()));
+            temp = String.format("%50s", temp);
+            output.print(String.format("%s: \t%s", temp, curCmd.getDescription()));
         }
     }
 
-    // подумать
     @Override
     public void history(Object[] args) {
         IOutputManager output = shell.getServerOutputManager();
@@ -140,7 +146,6 @@ public class ServerCommandReceiver extends AbstractReceiver {
         output.print("]");
     }
 
-    // проверить
     @Override
     public void minByCoordinates(Object[] args) {
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
@@ -150,25 +155,21 @@ public class ServerCommandReceiver extends AbstractReceiver {
             return;
         }
 
-        shell.getServerOutputManager().print(collection.stream().min(Comparator.comparing(Movie::getCoordinates)).toString());
+        shell.getServerOutputManager().print(collection.stream()
+                .min(Comparator.comparing(Movie::getCoordinates))
+                .get().toString());
     }
 
-    // проверить
     @Override
     public void removeAllByGoldenPalmCount(Object[] args) {
-//        if (!isInt((String) args[0])){
-//            throw new WrongArgumentException("remove_all_by_golden_palm_count");
-//        }
+        if (!isInt((String) args[1])){
+            throw new WrongArgumentException("remove_all_by_golden_palm_count");
+        }
 
-        Integer gp_count = Integer.parseInt((String) args[0]);
+        Integer gp_count = Integer.parseInt((String) args[1]);
 
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
 
-//        for (Movie i : collection){
-//            if (Objects.equals(i.getGoldenPalmCount(), gp_count)){
-//                shell.getCollectionManager().remove(i);
-//            }
-//        }
         collection.stream()
                 .filter((x) -> Objects.equals(x.getGoldenPalmCount(), gp_count))
                 .forEach((x) -> shell.getCollectionManager().remove(x));
@@ -176,24 +177,24 @@ public class ServerCommandReceiver extends AbstractReceiver {
         shell.getServerOutputManager().print("Элементы с количеством золотых пальмовых ветвей = " + gp_count + " удалены.");
     }
 
-    // проверить
     @Override
     public void removeById(Object[] args) {
-//        if (!isInt((String) args[0])){
-//            throw new WrongArgumentException("remove_by_id");
-//        }
+        if (!isInt((String) args[1])){
+            throw new WrongArgumentException("remove_by_id");
+        }
 
-        int id = Integer.parseInt((String) args[0]);
+        int id = Integer.parseInt((String) args[1]);
 
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
 
-        var stream = collection.stream()
-                .filter((x) -> x.getId() == id);
+        var a = collection.stream()
+                .filter((x) -> x.getId() == id)
+                .toList();
 
-        if (stream.findAny().isEmpty()){
+        if (a.isEmpty()){
             shell.getServerOutputManager().print("В коллекции нет элемента с id=" + id + ".");
         } else {
-            stream.forEach((x) -> {
+            a.forEach((x) -> {
                 shell.getCollectionManager().remove(x);
                 shell.getServerOutputManager().print("Элемент c id=" + id + "удален.");
             });
@@ -210,7 +211,6 @@ public class ServerCommandReceiver extends AbstractReceiver {
         shell.getServerOutputManager().print("Элемент удален.");
     }
 
-    // проверить
     @Override
     public void removeLower(Object[] args) {
         CollectionManager cm = shell.getCollectionManager();
@@ -240,13 +240,13 @@ public class ServerCommandReceiver extends AbstractReceiver {
         int id = Integer.parseInt((String) args[1]);
 
         Vector<Movie> collection = shell.getCollectionManager().getCollection();
-        for (Movie i : collection){
-            if (i.getId() == id){
-                i.update((Movie) args[2]);
-                shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
-                return;
-            }
+
+        var a = collection.stream().filter((x) -> x.getId() == id).findFirst();
+        if (a.isEmpty())
+            shell.getServerOutputManager().print("В коллекции нет элемента с id=" + id + ".");
+        else{
+            a.get().update((Movie) args[2]);
+            shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
         }
-        shell.getServerOutputManager().print("В коллекции нет элемента с id=" + id + ".");
     }
 }

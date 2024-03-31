@@ -20,4 +20,5 @@ public interface Command extends Serializable {
     void execute(String[] s, AbstractReceiver rec);
     void execute(AbstractReceiver rec);
     void setArgs(Object[] args);
+    Object[] getArgs();
 }

@@ -1,6 +1,8 @@
 package common.model.enums;
 
-public enum HairColor {
+import java.io.Serializable;
+
+public enum HairColor implements Serializable {
     GREEN,
     RED,
     BLUE,

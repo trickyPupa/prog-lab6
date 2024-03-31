@@ -16,6 +16,6 @@ public class HistoryCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.history(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.history(getArgs());
     }
 }

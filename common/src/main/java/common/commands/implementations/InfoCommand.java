@@ -15,6 +15,6 @@ public class InfoCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.info(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.info(getArgs());
     }
 }

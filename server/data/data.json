@@ -1,28 +1,4 @@
 [ {
-  "id" : 1,
-  "creationDate" : "18.02.2024",
-  "name" : "film3",
-  "oscarsCount" : 2,
-  "goldenPalmCount" : 2,
-  "length" : 120,
-  "coordinates" : {
-    "x" : 0,
-    "y" : 1
-  },
-  "mpaaRating" : "NC_17",
-  "director" : {
-    "name" : "Алексей",
-    "birthday" : "20.11.1932",
-    "eyeColor" : "BLUE",
-    "hairColor" : "RED",
-    "nationality" : "INDIA",
-    "location" : {
-      "x" : 12.0,
-      "y" : 11,
-      "z" : 9
-    }
-  }
-}, {
   "id" : 2,
   "creationDate" : "18.02.2024",
   "name" : "film2",

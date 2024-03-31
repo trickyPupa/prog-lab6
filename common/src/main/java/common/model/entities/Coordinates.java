@@ -32,7 +32,7 @@ public class Coordinates implements Checkable, Comparable<Coordinates> {
 
         try{
             while(true) {
-                output.print("Введиите координату X фильма (целое число больше -879): ");
+                output.print("Введиите координату X фильма (целое число >-879 и <2*10^9): ");
                 String line = input.nextLine();
                 if (line == null || line.equals("exit")){
                     throw new InterruptException();
@@ -45,7 +45,7 @@ public class Coordinates implements Checkable, Comparable<Coordinates> {
             }
 
             while(true) {
-                output.print("Введиите координату Y фильма (целое число не больше 155): ");
+                output.print("Введиите координату Y фильма (целое число <=155 и >-9*10^18): ");
                 String line = input.nextLine();
                 if (line == null || line.equals("exit")){
                     throw new InterruptException();

@@ -1,4 +1,4 @@
-package data_transfer;
+package network;
 
 import common.commands.abstractions.Command;
 

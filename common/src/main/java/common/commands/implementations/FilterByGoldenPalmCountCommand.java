@@ -17,6 +17,6 @@ public class FilterByGoldenPalmCountCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.filterByGoldenPalmCount(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.filterByGoldenPalmCount(getArgs());
     }
 }

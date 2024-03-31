@@ -1,5 +1,7 @@
 package common.model.entities;
 
-public interface Checkable {
+import java.io.Serializable;
+
+public interface Checkable extends Serializable {
     public boolean checkItself();
 }

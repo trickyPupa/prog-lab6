@@ -7,14 +7,13 @@ import common.commands.abstractions.AbstractCommand;
 import common.exceptions.FileException;
 import common.exceptions.WrongArgumentException;
 import common.model.entities.Movie;
+import static common.Utils.concatObjects;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.regex.Pattern;
-
-import static common.Utils.concatObjects;
 
 public class ClientReceiver extends AbstractReceiver {
 
@@ -31,18 +30,8 @@ public class ClientReceiver extends AbstractReceiver {
     }
 
     @Override
-    public void show(Object[] args) {
-        super.show(args);
-    }
-
-    @Override
     public void exit(Object[] args) {
         System.exit(0);
-    }
-
-    @Override
-    public void info(Object[] args) {
-        super.info(args);
     }
 
     // проверить
@@ -128,41 +117,6 @@ public class ClientReceiver extends AbstractReceiver {
     }
 
     @Override
-    public void filterByGoldenPalmCount(Object[] args) {
-        super.filterByGoldenPalmCount(args);
-    }
-
-    @Override
-    public void help(Object[] args) {
-        super.help(args);
-    }
-
-    @Override
-    public void history(Object[] args) {
-        super.history(args);
-    }
-
-    @Override
-    public void minByCoordinates(Object[] args) {
-        super.minByCoordinates(args);
-    }
-
-    @Override
-    public void removeAllByGoldenPalmCount(Object[] args) {
-        super.removeAllByGoldenPalmCount(args);
-    }
-
-    @Override
-    public void removeById(Object[] args) {
-        super.removeById(args);
-    }
-
-    @Override
-    public void removeFirst(Object[] args) {
-        super.removeFirst(args);
-    }
-
-    @Override
     public void removeLower(Object[] args) {
         modelObjectInput(args);
     }
@@ -173,7 +127,7 @@ public class ClientReceiver extends AbstractReceiver {
     }
 
     private void modelObjectInput(Object[] args){
-        addArg(args, Movie.createMovie1(inputManager, outputManager));
+        addArg(args, Movie.createMovie(inputManager, outputManager));
     }
     
     private void addArg(Object[] args, Object newArg){

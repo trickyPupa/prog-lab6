@@ -15,6 +15,6 @@ public class ShowCommand extends AbstractCommand {
     }
     @Override
     public void execute(AbstractReceiver rec) {
-        rec.show(Utils.concatObjects(new Object[] {this}, getArgs()));
+        rec.show(getArgs());
     }
 }
