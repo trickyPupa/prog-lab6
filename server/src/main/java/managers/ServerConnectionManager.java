@@ -21,10 +21,11 @@ public class ServerConnectionManager {
     private InetSocketAddress localSocketAddress;
     private SocketAddress curClient = null;
     private DatagramSocket socket;
-    private ServerCommandHandler handler;
+    protected ServerCommandHandler handler;
 
     public ServerConnectionManager(int p, ServerCommandHandler h) throws SocketException {
         handler = h;
+        h.setServerControlReceiver(new ServerControlReceiver(this));
 
         port = p;
         localSocketAddress = new InetSocketAddress(port);
@@ -79,7 +80,7 @@ public class ServerConnectionManager {
             return data;
         }
         // если сервер занят, и запрос пришел от другого клиента, ему отправляется ответ о занятости сервера
-        else if (!curClient.equals(address)){
+        else if (!address.equals(curClient)){
             sendResponse(new ConnectionResponse(false), address);
             logger.warn("Получен запрос от другого источника. Запрос игнорируется ");
             return null;
@@ -109,11 +110,11 @@ public class ServerConnectionManager {
                 if (i == chunks.length - 1) {
                     DatagramPacket dp = new DatagramPacket(concatBytes(chunk, new byte[]{1}), PACKET_SIZE, destination);
                     socket.send(dp);
-                    logger.info("Последний чанк размером " + chunk.length + " отправлен");
+//                    logger.info("Последний чанк размером " + chunk.length + " отправлен");
                 } else {
                     var dp = new DatagramPacket(concatBytes(chunk, new byte[]{0}), PACKET_SIZE, destination);
                     socket.send(dp);
-                    logger.info("Чанк размером " + chunk.length + " отправлен");
+//                    logger.info("Чанк размером " + chunk.length + " отправлен");
                 }
             }
 
@@ -126,10 +127,14 @@ public class ServerConnectionManager {
     }
 
     protected void disconnect(){
-        handler.vals.getServerOutputManager().print("Конец работы. Отключение от сервера.");
-        curClient = null;
+        if (curClient != null) {
+            sendResponse(new ConnectionResponse(false), curClient);
 
-        logger.info("Отключение клиента от сервера.");
+            handler.vals.getServerOutputManager().print("Конец работы. Отключение от сервера.");
+            curClient = null;
+
+            logger.info("Отключение клиента от сервера.");
+        }
     }
 
     public void run(){
@@ -168,6 +173,8 @@ public class ServerConnectionManager {
                     }
                 }
             }
+        } catch (SocketException e){
+
         } catch (IOException e){
             if (curClient != null) {
                 handler.vals.getServerOutputManager().print("Конец работы из-за ошибки [" + e + "] на сервере. Отключение от сервера.");
@@ -178,5 +185,10 @@ public class ServerConnectionManager {
             logger.error(e.getMessage() +  ": " + Arrays.toString(e.getStackTrace()));
             throw new RuntimeException(e);
         }
+    }
+
+    public void close(){
+        disconnect();
+        socket.close();
     }
 }

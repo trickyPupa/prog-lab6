@@ -10,9 +10,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
+import static java.lang.Math.max;
+
 public class Person implements Comparable<Person>, Checkable {
+    private static int maxNameLen = 10;
+
     private String name; //Поле не может быть null, Строка не может быть пустой
 //    @JsonSerialize(using = FileManager.CustomDateSerializer.class)
     private Date birthday; //Поле не может быть null
@@ -112,6 +117,8 @@ public class Person implements Comparable<Person>, Checkable {
 
             elem.setLocation(Location.createLocation(input, output));
 
+            if (elem.name.length() > maxNameLen)
+                maxNameLen = elem.name.length();
             return elem;
         } catch (IOException e){
             output.print("Что-то случилось, введите команду заново.");
@@ -126,13 +133,12 @@ public class Person implements Comparable<Person>, Checkable {
 
     @Override
     public String toString() {
-//        return name + " (" + nationality.name() + "), born in " + birthday.getYear();
-        return name + " (" + nationality.name() + "), born in " +
-                new SimpleDateFormat("dd.MM.yyyy").format(birthday);
+        return String.format("%s (%8s), born in %s", " ".repeat(max(maxNameLen - name.length(), 0)) + name,
+                nationality.name(), new SimpleDateFormat("dd.MM.yyyy").format(birthday));
     }
 
     @Override
     public int compareTo(Person o) {
-        return this.name.compareTo(o.name);
+        return !Objects.equals(this.name, o.name) ? this.name.compareTo(o.name) : -this.birthday.compareTo(o.birthday);
     }
 }

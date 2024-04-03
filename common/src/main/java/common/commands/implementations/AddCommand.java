@@ -5,12 +5,16 @@ import common.abstractions.DataInputReceiver;
 import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
 
+
 public class AddCommand extends AbstractCommand{
+    private static final String tab = " ".repeat(56);
     private static final String description = "Команда для добавления Movie в коллекцию. Требуется ввести все " +
-            "характеристики фильма:\n - Название (строка), количество \"Оскаров\" (целое число), количество " +
+            "характеристики фильма:\n" + tab + "- Название (строка), количество \"Оскаров\" (целое число), количество " +
             "золотых пальмовых ветвей (целое число или пустая строка), продолжительность фильма " +
-            "(целое число)\n - Координаты (2 целых числа: первое больше -879, второе  не больше 155)\n - MPAA" +
-            " рейтинг фильма (одна из строк: PG, PG_13, NC_17)\n - Режиссер фильма: имя, дата " +
+            "(целое число)\n" + tab + "- Координаты (2 целых числа: первое больше -879, второе  не больше 155)\n" +
+            tab + "- MPAA" +
+            " рейтинг фильма (одна из строк: PG, PG_13, NC_17)\n" +
+            tab + "- Режиссер фильма: имя, дата " +
             "рождения в формате ДД.ММ.ГГГГ, цвет глаз (одна из строк: BLUE, YELLOW, ORANGE, WHITE, " +
             "BROWN.), на отдельной строке цвет волос (одна " +
             "из строк: GREEN, RED, BLUE, YELLOW, ORANGE), национальность (одна из " +

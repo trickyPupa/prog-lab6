@@ -3,6 +3,7 @@ package client;
 import network.Request;
 import network.Response;
 
+import java.io.IOException;
 import java.net.InetAddress;
 
 public abstract class AbstractClientRequestManager {
@@ -16,5 +17,5 @@ public abstract class AbstractClientRequestManager {
 
     public abstract void makeRequest(Request request);
 
-    public abstract Response getResponse();
+    public abstract Response getResponse() throws IOException;
 }

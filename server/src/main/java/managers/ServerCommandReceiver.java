@@ -27,7 +27,14 @@ public class ServerCommandReceiver extends AbstractReceiver {
 
     @Override
     public void add(Object[] args) {
-        shell.getCollectionManager().add((Movie) args[1]);
+        Movie obj = (Movie) args[1];
+        if (shell.getCollectionManager().contains(obj)){
+            shell.getServerOutputManager().print("Элемент уже существует в коллекции");
+        } else {
+            obj.setGeneratedFields();
+            shell.getCollectionManager().add(obj);
+            shell.getServerOutputManager().print("Добавлен новый элемент, ему присвоен id=" + obj.getId() + ".");
+        }
     }
 
     @Override
@@ -36,7 +43,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
             FileManager fm = shell.getFileManager();
             fm.writeToFile(shell.getCollectionManager().getCollection());
         } catch (JsonProcessingException e) {
-            shell.getServerOutputManager().print("Не записать в файл:\n" + e.getMessage());
+            shell.getServerOutputManager().print("Невозможно записать в файл:\n" + e.getMessage() + ".");
         }
     }
 
@@ -54,6 +61,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
     // подумать
     @Override
     public void exit(Object[] args) {
+        shell.getServerOutputManager().print("Завершение работы.");
         throw new FinishConnecton();
     }
 
@@ -245,8 +253,15 @@ public class ServerCommandReceiver extends AbstractReceiver {
         if (a.isEmpty())
             shell.getServerOutputManager().print("В коллекции нет элемента с id=" + id + ".");
         else{
-            a.get().update((Movie) args[2]);
-            shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
+            Movie obj = (Movie) args[2];
+            if (shell.getCollectionManager().contains(obj)){
+                shell.getServerOutputManager().print("Такой элемент уже существует в коллекции");
+                shell.getServerOutputManager().print("Элемент c id=\" + id + \" не будет обновлён.");
+            } else {
+                obj.setGeneratedFields();
+                a.get().update(obj);
+                shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
+            }
         }
     }
 }

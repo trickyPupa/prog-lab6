@@ -5,6 +5,7 @@ import common.model.entities.Movie;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -24,11 +25,15 @@ public class CollectionManager extends AbstractCollectionManager<Movie> {
     public CollectionManager(Vector<Movie> vec){
         collection = new Vector<>(vec);
         creationDate = LocalDateTime.now();
+
+        Movie.setId_counter(vec.stream().map(Movie::getId).max(Integer::compareTo).orElse(1));
+        Movie.setMaxNameLen(vec.stream().map(Movie::getName).max(Comparator.comparingInt(String::length)).get().length());
     }
 
     @Override
     public void add(Movie element){
         collection.add(element);
+        collection.sort((x, y) -> CharSequence.compare(x.getName(), y.getName()));
     }
 
     @Override
@@ -50,13 +55,15 @@ public class CollectionManager extends AbstractCollectionManager<Movie> {
     @Override
     public String presentView(){
         if (collection.isEmpty()) return "Коллекция пуста";
-        String res = "Текущая коллекция фильмов:";
+        StringBuilder res = new StringBuilder("Текущая коллекция фильмов:");
 
-        for (Movie i : collection){
-            res = res + "\n - " + i.toString();
-        }
+        collection.stream().forEachOrdered((x) -> res.append("\n - ").append(x.toString()));
 
-        return res;
+        return res.toString();
+    }
+
+    public boolean contains(Movie m){
+        return collection.stream().anyMatch((x) -> x.compareTo(m) == 0);
     }
 
     /**

@@ -88,29 +88,25 @@ public class ClientRequestManager extends AbstractClientRequestManager {
     }
 
     @Override
-    public Response getResponse(){
+    public Response getResponse() throws IOException{
         boolean received = false;
         byte[] data = new byte[0];
 
-        try {
-            while (!received) {
-                ByteBuffer buf = ByteBuffer.allocate(PACKET_SIZE);
-                SocketAddress addr = null;
+        while (!received) {
+            ByteBuffer buf = ByteBuffer.allocate(PACKET_SIZE);
+            SocketAddress addr = null;
 
-                while (addr == null)
-                    addr = channel.receive(buf);
+            while (addr == null)
+                addr = channel.receive(buf);
 
-                if (buf.array()[PACKET_SIZE - 1] == 1) {
-                    received = true;
-                }
-
-                data = concatBytes(data, Arrays.copyOf(buf.array(), DATA_SIZE));
+            if (buf.array()[PACKET_SIZE - 1] == 1) {
+                received = true;
             }
 
-            Response cr = (Response) Serializer.deserializeData(data);
-            return cr;
-        } catch (IOException e){
-            throw new RuntimeException(e);
+            data = concatBytes(data, Arrays.copyOf(buf.array(), DATA_SIZE));
         }
+
+        Response cr = (Response) Serializer.deserializeData(data);
+        return cr;
     }
 }

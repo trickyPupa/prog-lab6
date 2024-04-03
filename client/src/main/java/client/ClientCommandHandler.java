@@ -3,11 +3,15 @@ package client;
 import common.Utils;
 import common.abstractions.*;
 import common.commands.abstractions.AbstractCommand;
+import common.exceptions.InterruptException;
 import common.exceptions.NoSuchCommandException;
 import common.commands.abstractions.Command;
 import common.commands.implementations.*;
+import exceptions.ConnectionsFallsExcetion;
 import jdk.jshell.execution.Util;
 import network.CommandRequest;
+import network.ConnectionResponse;
+import network.Response;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,18 +60,18 @@ public class ClientCommandHandler implements Handler {
     }
 
     @Override
-    public void nextCommand(String line) {
+    public void nextCommand(String line) throws IOException{
         line = line.strip();
         String commandName;
 //        String[] args;
-        Object[] args;
+        Object[] args = {};
 
         if (line.contains(" ")){
             commandName = line.substring(0, line.indexOf(" ")).strip();
             args = line.substring(1 + commandName.length()).split(" ");
         } else{
             commandName = line.strip();
-            args = new String[]{""};
+//            args = new String[]{""};
         }
 
         if (!commands.containsKey(commandName)){
@@ -86,8 +90,14 @@ public class ClientCommandHandler implements Handler {
             clientRequestManager.makeRequest(new CommandRequest(currentCommand));
         }
 
+//        System.out.println(Arrays.toString(currentCommand.getArgs()));
+
         // получить ответ сервера
-        String result = clientRequestManager.getResponse().getMessage();
+        Response response = clientRequestManager.getResponse();
+        if (response instanceof ConnectionResponse && !((ConnectionResponse) response).isSuccess()){
+            throw new ConnectionsFallsExcetion();
+        }
+        String result = response.getMessage();
 
         outputManager.print(result);
     }

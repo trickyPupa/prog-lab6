@@ -1,11 +1,15 @@
 package managers;
 
+import commands.*;
 import common.abstractions.*;
+import common.commands.abstractions.AbstractCommand;
 import common.commands.abstractions.Command;
 import common.commands.implementations.*;
+import common.exceptions.NoSuchCommandException;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -50,8 +54,13 @@ public class ServerCommandHandler implements Handler{
     }
 
     protected ShellValuables vals;
-
     protected AbstractReceiver receiver;
+    protected ServerControlReceiver serverControlReceiver;
+    protected static Map<String, Function<Object[], AbstractServerCommand>> serverCommands = new HashMap<>();
+    static {
+        serverCommands.put("disconnect", DisconnectServerCommand::new);
+        serverCommands.put("stop", StopServerCommand::new);
+    }
 
     public ServerCommandHandler(ServerOutputManager server_out, CollectionManager col, FileManager fm, Logger logger){
         vals = new ShellValuables(server_out, col, fm, new HistoryManager(), logger);
@@ -76,21 +85,40 @@ public class ServerCommandHandler implements Handler{
         }
     }
 
+    public void setServerControlReceiver(ServerControlReceiver scr){
+        serverControlReceiver = scr;
+    }
+
     public void nextCommand(Command currentCommand) {
         vals.logger.info("Выполняется команда " + currentCommand.getName());
 
+        vals.logger.info("Переданные аргументы: " + Arrays.toString(currentCommand.getArgs()));
+
         currentCommand.execute(receiver);
         vals.getHistoryManager().next(currentCommand);
-        vals.logger.info("Команда " + currentCommand.getName() + "выполнена");
+        vals.logger.info("Команда " + currentCommand.getName() + " выполнена");
     }
 
     @Override
     public void nextCommand() throws IOException {
-
+        ;
     }
 
     @Override
-    public void nextCommand(String commandName) {
+    public void nextCommand(String commandName) throws IOException {
+        ;
+    }
 
+    public int nextServerCommand(String line){
+        Object[] args;
+        String[] split = line.strip().split(" ");
+        args = Arrays.copyOfRange(split, 1, split.length);
+
+        if (!serverCommands.containsKey(split[0])){
+            vals.logger.warn("Сервер: нет такой команды.");
+            return 0;
+        }
+        AbstractServerCommand cmd = serverCommands.get(split[0]).apply(args);
+        return cmd.execute(serverControlReceiver);
     }
 }

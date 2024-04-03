@@ -8,13 +8,18 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class ServerApp {
+
     public static int PORT = 1783;
     public static Logger logger = LogManager.getRootLogger();
 
     public static void main(String[] args) {
-        start("C:\\Users\\timof\\IdeaProjects\\prog-lab6\\server\\data\\data.json");
+        // "C:\\Users\\timof\\IdeaProjects\\prog-lab6\\server\\data\\data.json"
+
+        String filename = args[0].strip();
+        start(filename);
 //        test();
     }
 
@@ -49,15 +54,49 @@ public class ServerApp {
             }
         }
 
-        while (true){
+        Scanner scanner = new Scanner(System.in);
+
+        class NonblockInput extends Thread {
+            private ServerConnectionManager scm;
+            private Scanner scanner;
+
+            public NonblockInput(ServerConnectionManager s, Scanner a) {
+                super();
+                scm = s;
+                scanner = a;
+            }
+
+            public void run() {
+                while (true) {
+                    if (scanner.hasNext()){
+                        String text = scanner.nextLine();
+
+                        int commandCode = handler.nextServerCommand(text);
+                        if (commandCode == 1){
+                            logger.info("Завершение работы сервера.");
+                            scm.close();
+                            scanner.close();
+                            System.exit(0);
+                        }
+
+                    }
+                }
+            }
+        }
+
+        NonblockInput a = new NonblockInput(serverConnectionManager, scanner);
+        a.setPriority(Thread.MIN_PRIORITY);
+        a.start();
+
+        while (true) {
             try {
                 serverConnectionManager.run();
+
             }
-            catch (RuntimeException e){
-//                outputManager.print(e);
-                System.out.println(e);
-                System.out.println("main catch runtime");
-                logger.error(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+            catch (RuntimeException e) {
+//                System.out.println(e);
+//                System.out.println("main catch runtime");
+                logger.error(e + "\n" + Arrays.toString(e.getStackTrace()));
             }
         }
     }

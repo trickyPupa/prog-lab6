@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class ClientReceiver extends AbstractReceiver {
@@ -26,7 +27,10 @@ public class ClientReceiver extends AbstractReceiver {
 
     @Override
     public void add(Object[] args) {
+//        System.out.println(Arrays.toString(args));
+//        System.out.println(args.length);
         modelObjectInput(args);
+//        System.out.println(Arrays.toString(((AbstractCommand) args[0]).getArgs()));
     }
 
     @Override
@@ -61,7 +65,7 @@ public class ClientReceiver extends AbstractReceiver {
                     }
 
                 }
-                writer.append("\n").append(temp);
+                writer.append(temp).append("\n");
             }
 
             CharArrayReader car = new CharArrayReader(writer.toString().toCharArray());
@@ -72,8 +76,8 @@ public class ClientReceiver extends AbstractReceiver {
         } catch (FileNotFoundException e) {
             throw new FileException("Нет файла с указанным именем");
         } catch (IOException e){
-            outputManager.print("Ошибка при чтении данных.");
-            outputManager.print(e.getMessage());
+            outputManager.print("Ошибка при чтении данных в файле.");
+            outputManager.print(e);
         }
     }
 

@@ -9,17 +9,19 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static common.Utils.*;
+import static java.lang.Math.max;
 
 /**
  * Класс, хранящий описание фильма.
  */
 
 public class Movie implements Comparable<Movie>, Checkable {
-//    private static int id_counter = 0;
-
+    private static int id_counter = 0;
+    private static int maxNameLen = 10;
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
 
 //    @JsonSerialize(using = FileManager.CustomLocalDateSerializer.class)
@@ -36,9 +38,7 @@ public class Movie implements Comparable<Movie>, Checkable {
     private Person director; //Поле не может быть null
 
     protected Movie(){
-//        id_counter++;
-//        id = id_counter;
-//        creationDate = LocalDate.now();
+        ;
     }
 
     /**
@@ -91,24 +91,6 @@ public class Movie implements Comparable<Movie>, Checkable {
         return coordinates;
     }
 
-    private void setArgs(String[] args) {
-        for (int i = 0; i < 4; i++){
-            switch (i){
-                case 0:
-                    this.name = args[i].strip();
-                    break;
-                case 1:
-                    this.oscarsCount = Integer.parseInt(args[i].strip());
-                    break;
-                case 2:
-                    this.goldenPalmCount = Integer.parseInt(args[i].strip());
-                    break;
-                case 3:
-                    this.length = Integer.parseInt(args[i].strip());
-            }
-        }
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -135,6 +117,14 @@ public class Movie implements Comparable<Movie>, Checkable {
 
     protected void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public static void setId_counter(int id){
+        id_counter = id;
+    }
+
+    public static void setMaxNameLen(int maxNameLen) {
+        Movie.maxNameLen = maxNameLen;
     }
 
     /**
@@ -216,7 +206,16 @@ public class Movie implements Comparable<Movie>, Checkable {
             output.print(e.getMessage());
         }
 
+        if (elem.name.length() > maxNameLen)
+            maxNameLen = elem.name.length();
+
         return elem;
+    }
+
+    public void setGeneratedFields(){
+        id_counter++;
+        id = id_counter;
+        creationDate = LocalDate.now();
     }
 
 
@@ -229,13 +228,13 @@ public class Movie implements Comparable<Movie>, Checkable {
     @Override
     public String toString() {
         return String.format("%3d: %s (%s; rating - %5s; coordinates - %10s) with %3d Oscars and %3d Golden Palms by %10s.",
-                id, name, creationDate, mpaaRating.name(), coordinates.toString(), oscarsCount, goldenPalmCount,
+                id, " ".repeat(max(maxNameLen - name.length(), 0)) + name, creationDate, mpaaRating.name(), coordinates.toString(), oscarsCount, goldenPalmCount,
                 director.toString());
     }
 
     @Override
     public int compareTo(Movie o) {
 //        return this.creationDate != o.creationDate ? this.creationDate.compareTo(o.creationDate) : this.name.compareTo(o.name);
-        return this.name.compareTo(o.name);
+        return !Objects.equals(this.name, o.name) ? this.name.compareTo(o.name) : this.director.compareTo(o.director);
     }
 }
