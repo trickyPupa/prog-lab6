@@ -30,25 +30,7 @@ public class ClientCommandHandler implements Handler {
     private AbstractReceiver simpleReceiver;
     private DataInputReceiver dataInputReceiver;
 
-    public final Map<String, Function<Object[], Command>> commands = new HashMap<>();
-
-    {
-        commands.put("help", HelpCommand::new);
-        commands.put("exit", ExitCommand::new);
-        commands.put("add", AddCommand::new);
-        commands.put("show", ShowCommand::new);
-        commands.put("info", InfoCommand::new);
-        commands.put("clear", ClearCommand::new);
-        commands.put("update", UpdateCommand::new);
-        commands.put("history", HistoryCommand::new);
-        commands.put("remove_first", RemoveFirstCommand::new);
-        commands.put("remove_by_id", RemoveByIdCommand::new);
-        commands.put("filter_by_golden_palm_count", FilterByGoldenPalmCountCommand::new);
-        commands.put("min_by_coordinates", MinByCoordinatesCommand::new);
-        commands.put("remove_all_by_golden_palm_count", RemoveAllByGoldenPalmCountCommand::new);
-        commands.put("remove_lower", RemoveLowerCommand::new);
-        commands.put("execute_script", ExecuteScriptCommand::new);
-    }
+    public Map<String, Function<Object[], Command>> commands = new HashMap<>();
 
     public ClientCommandHandler(IInputManager inp, IOutputManager out, AbstractClientRequestManager crm,
                                 AbstractReceiver rec, DataInputReceiver dir){
@@ -57,6 +39,13 @@ public class ClientCommandHandler implements Handler {
         clientRequestManager = crm;
         simpleReceiver = rec;
         dataInputReceiver = dir;
+    }
+
+    public void setCommands(Map<String, AbstractCommand> cmlist){
+        commands.clear();
+        for (String name : cmlist.keySet()){
+            commands.put(name, cmlist.get(name).getConstructor());
+        }
     }
 
     @Override

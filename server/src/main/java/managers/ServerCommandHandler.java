@@ -61,6 +61,8 @@ public class ServerCommandHandler implements Handler{
         serverCommands.put("disconnect", DisconnectServerCommand::new);
         serverCommands.put("stop", StopServerCommand::new);
     }
+    public static final Map<String, AbstractCommand> commandsListForClient = new HashMap<>();
+
 
     public ServerCommandHandler(ServerOutputManager server_out, CollectionManager col, FileManager fm, Logger logger){
         vals = new ShellValuables(server_out, col, fm, new HistoryManager(), logger);
@@ -82,6 +84,24 @@ public class ServerCommandHandler implements Handler{
             vals.commands.put("remove_all_by_golden_palm_count", RemoveAllByGoldenPalmCountCommand::new);
             vals.commands.put("remove_lower", RemoveLowerCommand::new);
             vals.commands.put("execute_script", ExecuteScriptCommand::new);
+        }
+
+        {
+            commandsListForClient.put("help", new HelpCommand(null));
+            commandsListForClient.put("exit", new ExitCommand(null));
+            commandsListForClient.put("add", new AddCommand(null));
+            commandsListForClient.put("show", new ShowCommand(null));
+            commandsListForClient.put("info", new InfoCommand(null));
+            commandsListForClient.put("clear", new ClearCommand(null));
+            commandsListForClient.put("update", new UpdateCommand(null));
+            commandsListForClient.put("history", new HistoryCommand(null));
+            commandsListForClient.put("remove_first", new RemoveFirstCommand(null));
+            commandsListForClient.put("remove_by_id", new RemoveByIdCommand(null));
+            commandsListForClient.put("filter_by_golden_palm_count", new FilterByGoldenPalmCountCommand(null));
+            commandsListForClient.put("min_by_coordinates", new MinByCoordinatesCommand(null));
+            commandsListForClient.put("remove_all_by_golden_palm_count", new RemoveAllByGoldenPalmCountCommand(null));
+            commandsListForClient.put("remove_lower", new RemoveLowerCommand(null));
+            commandsListForClient.put("execute_script", new ExecuteScriptCommand(null));
         }
     }
 

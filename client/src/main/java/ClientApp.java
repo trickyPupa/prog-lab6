@@ -15,11 +15,23 @@ import java.net.PortUnreachableException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
+import static common.Utils.isInt;
+
 public class ClientApp {
     public static int PORT = 1783;
     public static String HOST_NAME = "localhost";
 
     public static void main(String[] args) {
+        if (isInt(args[1]))
+            PORT = Integer.parseInt(args[1]);
+        else
+            System.out.println("Некорректный аргумент 1 (порт)");
+
+        String host = args[0];
+        if (host == null || host.isBlank())
+            HOST_NAME = "localhost";
+        else
+            HOST_NAME = host;
         start();
     }
 
@@ -30,20 +42,21 @@ public class ClientApp {
             IOutputManager outputManager = new OutputManager();
             AbstractReceiver receiver = new ClientReceiver(inputManager, outputManager);
 
-            AbstractClientRequestManager clientRequestManager = new ClientRequestManager(InetAddress.getLocalHost(), PORT);
+            AbstractClientRequestManager clientRequestManager = new ClientRequestManager(HOST_NAME, PORT);
 
             ClientCommandHandler handler = new ClientCommandHandler(inputManager, outputManager, clientRequestManager,
                     receiver, null);
 
 
             clientRequestManager.makeRequest(new ConnectionRequest());
-            var answer = clientRequestManager.getResponse();
+            var answer = (ConnectionResponse) clientRequestManager.getResponse();
             outputManager.print(answer.getMessage());
 
-            if (!((ConnectionResponse) answer).isSuccess()){
+            if (!answer.isSuccess()){
                 outputManager.print("Попробуйте позже. Завершение работы.");
                 System.exit(0);
             }
+            handler.setCommands(answer.getCommandList());
 
             class MyHook extends Thread{
                 private AbstractClientRequestManager crm;

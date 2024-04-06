@@ -4,6 +4,9 @@ import common.Utils;
 import common.abstractions.DataInputReceiver;
 import common.commands.abstractions.AbstractCommand;
 import common.abstractions.AbstractReceiver;
+import common.commands.abstractions.Command;
+
+import java.util.function.Function;
 
 
 public class AddCommand extends AbstractCommand{
@@ -37,10 +40,14 @@ public class AddCommand extends AbstractCommand{
 
         r.add(s);
     }
-
     @Override
     public void execute(AbstractReceiver rec) {
         rec.add(getArgs());
+    }
+
+    @Override
+    public Function<Object[], Command> getConstructor() {
+        return AddCommand::new;
     }
 
 }

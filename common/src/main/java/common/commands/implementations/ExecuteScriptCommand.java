@@ -3,6 +3,9 @@ package common.commands.implementations;
 import common.abstractions.AbstractReceiver;
 import common.Utils;
 import common.commands.abstractions.AbstractCommand;
+import common.commands.abstractions.Command;
+
+import java.util.function.Function;
 
 public class ExecuteScriptCommand extends AbstractCommand {
     public ExecuteScriptCommand(Object[] args) {
@@ -18,5 +21,10 @@ public class ExecuteScriptCommand extends AbstractCommand {
     @Override
     public void execute(AbstractReceiver rec) {
         rec.executeScript(getArgs());
+    }
+
+    @Override
+    public Function<Object[], Command> getConstructor() {
+        return ExecuteScriptCommand::new;
     }
 }

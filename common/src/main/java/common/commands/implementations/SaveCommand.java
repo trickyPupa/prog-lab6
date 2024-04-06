@@ -3,6 +3,9 @@ package common.commands.implementations;
 import common.abstractions.AbstractReceiver;
 import common.Utils;
 import common.commands.abstractions.AbstractCommand;
+import common.commands.abstractions.Command;
+
+import java.util.function.Function;
 
 public class SaveCommand extends AbstractCommand {
     public SaveCommand(Object[] args){
@@ -16,5 +19,10 @@ public class SaveCommand extends AbstractCommand {
     @Override
     public void execute(AbstractReceiver rec) {
         rec.save(getArgs());
+    }
+
+    @Override
+    public Function<Object[], Command> getConstructor() {
+        return SaveCommand::new;
     }
 }

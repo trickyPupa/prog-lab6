@@ -139,6 +139,6 @@ public class Person implements Comparable<Person>, Checkable {
 
     @Override
     public int compareTo(Person o) {
-        return !Objects.equals(this.name, o.name) ? this.name.compareTo(o.name) : -this.birthday.compareTo(o.birthday);
+        return !Objects.equals(this.name, o.name) ? this.name.toLowerCase().compareTo(o.name.toLowerCase()) : -this.birthday.compareTo(o.birthday);
     }
 }

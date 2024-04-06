@@ -74,7 +74,7 @@ public class ServerConnectionManager {
 
             curClient = address;
             ((ConnectionRequest) data).setSuccess(true);
-            sendResponse(new ConnectionResponse(true), address);
+            sendResponse(new ConnectionResponse(ServerCommandHandler.commandsListForClient, true), address);
 //            logger.info("Установлено подключение с клиентом " + curClient);
 
             return data;

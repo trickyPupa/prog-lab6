@@ -3,6 +3,9 @@ package common.commands.implementations;
 import common.abstractions.AbstractReceiver;
 import common.Utils;
 import common.commands.abstractions.AbstractCommand;
+import common.commands.abstractions.Command;
+
+import java.util.function.Function;
 
 public class RemoveAllByGoldenPalmCountCommand extends AbstractCommand {
     public RemoveAllByGoldenPalmCountCommand(Object[] args) {
@@ -18,5 +21,10 @@ public class RemoveAllByGoldenPalmCountCommand extends AbstractCommand {
     @Override
     public void execute(AbstractReceiver rec) {
         rec.removeAllByGoldenPalmCount(getArgs());
+    }
+
+    @Override
+    public Function<Object[], Command> getConstructor() {
+        return RemoveAllByGoldenPalmCountCommand::new;
     }
 }

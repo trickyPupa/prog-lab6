@@ -235,6 +235,6 @@ public class Movie implements Comparable<Movie>, Checkable {
     @Override
     public int compareTo(Movie o) {
 //        return this.creationDate != o.creationDate ? this.creationDate.compareTo(o.creationDate) : this.name.compareTo(o.name);
-        return !Objects.equals(this.name, o.name) ? this.name.compareTo(o.name) : this.director.compareTo(o.director);
+        return !Objects.equals(this.name.toLowerCase(), o.name.toLowerCase()) ? this.name.toLowerCase().compareTo(o.name.toLowerCase()) : this.director.compareTo(o.director);
     }
 }

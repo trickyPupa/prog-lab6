@@ -33,6 +33,10 @@ public class CollectionManager extends AbstractCollectionManager<Movie> {
     @Override
     public void add(Movie element){
         collection.add(element);
+        sort();
+    }
+
+    public void sort(){
         collection.sort((x, y) -> CharSequence.compare(x.getName(), y.getName()));
     }
 

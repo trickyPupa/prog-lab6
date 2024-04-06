@@ -3,6 +3,9 @@ package common.commands.implementations;
 import common.abstractions.AbstractReceiver;
 import common.Utils;
 import common.commands.abstractions.AbstractCommand;
+import common.commands.abstractions.Command;
+
+import java.util.function.Function;
 
 public class MinByCoordinatesCommand extends AbstractCommand {
     public MinByCoordinatesCommand(Object[] args) {
@@ -17,5 +20,10 @@ public class MinByCoordinatesCommand extends AbstractCommand {
     @Override
     public void execute(AbstractReceiver rec) {
         rec.minByCoordinates(getArgs());
+    }
+
+    @Override
+    public Function<Object[], Command> getConstructor() {
+        return MinByCoordinatesCommand::new;
     }
 }

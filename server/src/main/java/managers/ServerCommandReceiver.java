@@ -163,9 +163,9 @@ public class ServerCommandReceiver extends AbstractReceiver {
             return;
         }
 
+//        var res = collection.stream().min(Comparator.comparing(Movie::getCoordinates)).get();
         shell.getServerOutputManager().print(collection.stream()
-                .min(Comparator.comparing(Movie::getCoordinates))
-                .get().toString());
+                .min(Comparator.comparing(Movie::getCoordinates)).get().toString());
     }
 
     @Override
@@ -260,6 +260,7 @@ public class ServerCommandReceiver extends AbstractReceiver {
             } else {
                 obj.setGeneratedFields();
                 a.get().update(obj);
+                shell.getCollectionManager().sort();
                 shell.getServerOutputManager().print("Элемент c id=" + id + " обновлён.");
             }
         }
